@@ -16,7 +16,7 @@ init:
 install:
   - ps: Install-Product node 7.9.0 x86
   - git reset --hard HEAD
-  - npm install npm@5.4.0 -g
+  - npm install npm@5.4.0 
   - npm install
   
 

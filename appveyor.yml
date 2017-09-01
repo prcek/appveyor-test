@@ -16,7 +16,7 @@ init:
 install:
   - ps: Install-Product node 7.9.0 x86
   - git reset --hard HEAD
-  - npm install npm -g
+  - npm install npm@5.4.0 -g
   - npm install
   
 
@@ -27,8 +27,7 @@ build_script:
   - npm run package
 
 artifacts:
-  - path: 'dist\win-ia32\*.exe'
-    name: setup
+  - path: builds
   
 
 on_finish:

@@ -2,6 +2,11 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
+import FontAwesome from 'react-fontawesome';
+
+
+
+
 const HallInfo = createReactClass({
 
     propTypes: {
@@ -27,7 +32,11 @@ const HallInfo = createReactClass({
 
     render: function() {
         return (
-            <div> HallInfo at {this.state.clock.toLocaleTimeString()} is total: {this.props.male+this.props.female} male: {this.props.male} female: {this.props.female}</div>
+            <div> HallInfo at {this.state.clock.toLocaleTimeString()} is 
+                &sum;: {this.props.male+this.props.female} 
+                <FontAwesome name={"male"}/>: {this.props.male} 
+                <FontAwesome name={"female"}/>: {this.props.female}
+            </div>
         )
     }
 });

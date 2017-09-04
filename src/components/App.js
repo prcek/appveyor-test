@@ -11,6 +11,8 @@ import Button from 'material-ui/Button';
 import AccessAlarmIcon from 'material-ui-icons/AccessAlarm';
 import FontAwesome from 'react-fontawesome';
 
+import HallInfo from './HallInfo';
+
 
 var Datastore = require('nedb');
 
@@ -51,6 +53,7 @@ class App extends React.Component {
         <AccessAlarmIcon/>
         <FontAwesome spin={true} className="text-danger" name="spinner" size="3x" />
         <p> message: {this.state.message} </p>
+        <HallInfo male={1} female={5}/>
       </div>
     );
   }

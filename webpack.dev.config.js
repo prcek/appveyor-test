@@ -41,7 +41,8 @@ module.exports = {
       }
     ]
   },
-  target: 'electron-renderer',
+ // target: 'electron-renderer',
+  target: 'web',
   plugins: [
     new HtmlWebpackPlugin(),
     new webpack.DefinePlugin({

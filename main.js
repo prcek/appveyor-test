@@ -1,5 +1,4 @@
 'use strict';
-
 // Import parts of electron to use
 const {app, BrowserWindow} = require('electron');
 const path = require('path')
@@ -43,7 +42,7 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     // Open the DevTools automatically if developing
-    if ( dev ) {
+    if ( dev && process.argv.indexOf('--DevTools') > -1 ) {
       mainWindow.webContents.openDevTools();
     }
   });

@@ -2,6 +2,7 @@ import '../assets/css/App.css';
 import '../assets/css/font-awesome.css';
 import '../assets/css/font-roboto.css';
 
+import decode_card from '../utils/decode';
 
 import React, { Component } from 'react';
 
@@ -12,6 +13,7 @@ import AccessAlarmIcon from 'material-ui-icons/AccessAlarm';
 import FontAwesome from 'react-fontawesome';
 
 import HallInfo from './HallInfo';
+import Display from './Display';
 
 
 var Datastore = require('nedb');
@@ -38,9 +40,11 @@ class App extends React.Component {
   }
   onButton(e) {
     console.log("button!");
-    remote_api.get("/todos").then(res=>{
-      this.setState({message:JSON.stringify(res)});
-    });
+    this.setState({message:'hello!'})
+    console.log(decode_card("TS*69626*eJyrVipLLVKyUgoJNlTSUcpMUbIyszQzMtNRKk5NLM7PA8oYGRia6xtaAGWT80uLilOBQiCleYm5IKZLYhlQE1B5aRFUJKbUwNDMoAREGSYVACmDVMM8kIrUCqBsrlItACfLIG4=*2933823073*302954397**"));
+    //remote_api.get("/todos").then(res=>{
+    //  this.setState({message:JSON.stringify(res)});
+    //});
   }
   render() {
     return (
@@ -54,6 +58,7 @@ class App extends React.Component {
         <FontAwesome spin={true} className="text-danger" name="spinner" size="3x" />
         <p> message: {this.state.message} </p>
         <HallInfo male={1} female={5}/>
+        <Display activeScan={true} message={this.state.message}/>
       </div>
     );
   }

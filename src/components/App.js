@@ -14,20 +14,22 @@ import FontAwesome from 'react-fontawesome';
 
 import HallInfo from './HallInfo';
 import Display from './Display';
+import CfgDialog from './CfgDialog';
+import SyncPanel from './SyncPanel';
 
-import {startSync,stopSync,findRefGid,getCoursesTree} from '../utils/Db';
+import {startSync,stopSync,findRefGid,getCoursesTree,registerDBCallback,getSyncState} from '../utils/Db';
 
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { message: "hi!"};
+    this.state = { message: "hi!", activeSync: false, syncOk:null, cfgOpen: false};
   }
   onButton(e) {
     console.log("button!");
     this.setState({message:'hello!'})
-    //startSync();
+    startSync();
     //const dc = decode_card("TS*69626*eJyrVipLLVKyUgoJNlTSUcpMUbIyszQzMtNRKk5NLM7PA8oYGRia6xtaAGWT80uLilOBQiCleYm5IKZLYhlQE1B5aRFUJKbUwNDMoAREGSYVACmDVMM8kIrUCqBsrlItACfLIG4=*2933823073*302954397**");
     //console.log(dc);
     //findRefGid(dc.id,(res)=>{
@@ -37,16 +39,40 @@ class App extends React.Component {
       console.log(tree);
     })
   }
+
+  onCfgButton(e) {
+    console.log("cfg button!");
+    this.setState({cfgOpen:true})
+  }
+
+  onDBChange(e) {
+    console.log("onDBChange",e)
+    this.setState({activeSync:e.active,syncOk:e.ok});
+  } 
+
+  componentDidMount() {
+    registerDBCallback((e)=>{this.onDBChange(e)});
+    this.setState({activeSync:getSyncState().active, syncOk:getSyncState().ok});
+  }
+  componentWillUnmount() {
+    registerDBCallback(null);
+  }
+
   render() {
     return (
       <div>
+        <CfgDialog open={this.state.cfgOpen} onRequestClose={(e)=>this.setState({cfgOpen:false})}/>
         <h1>Hello, Electron!</h1>
+        <SyncPanel activeSync={this.state.activeSync} syncOk={this.state.syncOk}/>
         <p>I hope you enjoy using basic-electron-react-boilerplate to start your dev off right!</p>
         <Button raised color="primary" onClick={(e)=>this.onButton(e)}>
           Primary
         </Button>
+        <Button raised color="primary" onClick={(e)=>this.onCfgButton(e)}>
+          Cfg
+        </Button>
         <AccessAlarmIcon/>
-        <FontAwesome spin={true} className="text-danger" name="spinner" size="3x" />
+        <FontAwesome spin={this.state.activeSync} className="text-danger" name="spinner" size="3x" />
         <p> message: {this.state.message} </p>
         <HallInfo male={1} female={5}/>
         <Display activeScan={true} message={this.state.message}/>

@@ -26,6 +26,9 @@ var folders_db = new Datastore({ filename: 'folders.db', autoload: true });
 var courses_db = new Datastore({ filename: 'courses.db', autoload: true });
 var students_db = new Datastore({ filename: 'students.db', autoload: true });
 
+var stateCallBack = null;
+var syncIsRunning = false;
+var syncIsOk = null;
 
 
 function fixId(obj) {
@@ -200,11 +203,29 @@ function completeUpdate() {
         }).catch(reject);
     }); 
 }
-
+function reportState() {
+    if (stateCallBack) {
+        stateCallBack(getSyncState());
+    }
+}
 
 function startSync(){
     console.log("db sync start");
-    completeUpdate().then(console.log).catch(console.error);    
+    if (syncIsRunning) {
+        return;
+    }
+    syncIsRunning = true;
+    syncIsOk = null;
+    reportState();
+    completeUpdate().then(r=>{
+        syncIsRunning = false;
+        syncIsOk = true;
+        reportState();
+    }).catch(e=>{
+        syncIsRunning = false;
+        syncIsOk = false;
+        reportState();
+    });    
 }
 function stopSync(){
     console.log("db sync stop");   
@@ -243,9 +264,20 @@ function getCoursesTree(callback) {
     }).catch(callback(null));
 }
 
+
+function registerDBCallback(callback) {
+    stateCallBack = callback;
+}
+
+function getSyncState() {
+    return {active:syncIsRunning,ok:syncIsOk};
+}
+
 module.exports = {
     startSync:startSync,
     stopSync:stopSync,
+    registerDBCallback: registerDBCallback,
+    getSyncState: getSyncState,
     findRefGid: findRefGid,
     getCoursesTree: getCoursesTree
 }

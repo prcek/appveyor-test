@@ -3,6 +3,9 @@ import Button from 'material-ui/Button';
 import Grid from 'material-ui/Grid';
 import PropTypes from 'prop-types';
 
+
+
+
 class Message extends Component {
     render() {
             return (

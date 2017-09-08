@@ -16,6 +16,7 @@ import HallInfo from './HallInfo';
 import Display from './Display';
 import CfgDialog from './CfgDialog';
 import SyncPanel from './SyncPanel';
+import CoursesTree from './CoursesTree';
 
 import {startSync,stopSync,findRefGid,getCoursesTree,registerDBCallback,getSyncState} from '../utils/Db';
 
@@ -24,7 +25,7 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { message: "hi!", activeSync: false, syncOk:null, cfgOpen: false};
+    this.state = { message: "hi!", activeSync: false, syncOk:null, cfgOpen: false, activeCourses:[], activeHostCourses:[], coursesList:[]};
   }
   onButton(e) {
     console.log("button!");
@@ -50,9 +51,51 @@ class App extends React.Component {
     this.setState({activeSync:e.active,syncOk:e.ok});
   } 
 
+  handleActiveCourse(id,state) {
+    console.log("handleActiveCourse",id,state);
+
+    const { activeCourses } = this.state;
+    const currentIndex = activeCourses.indexOf(id);
+    const newActiveCourses = [...activeCourses];
+
+    if (currentIndex === -1) {
+      newActiveCourses.push(id);
+    } else {
+      newActiveCourses.splice(currentIndex, 1);
+    }
+
+    this.setState({
+      activeCourses: newActiveCourses,
+    });
+
+  }
+
+  handleActiveHostCourse(id,state) {
+    console.log("handleActiveHostCourse",id,state);
+
+    const { activeHostCourses } = this.state;
+    const currentIndex = activeHostCourses.indexOf(id);
+    const newActiveHostCourses = [...activeHostCourses];
+
+    if (currentIndex === -1) {
+      newActiveHostCourses.push(id);
+    } else {
+      newActiveHostCourses.splice(currentIndex, 1);
+    }
+
+    this.setState({
+      activeHostCourses: newActiveHostCourses,
+    });
+
+  }
+ 
   componentDidMount() {
     registerDBCallback((e)=>{this.onDBChange(e)});
     this.setState({activeSync:getSyncState().active, syncOk:getSyncState().ok});
+    getCoursesTree((list)=>{
+      console.log("list ready",list)
+      this.setState({coursesList:list})
+    })
   }
   componentWillUnmount() {
     registerDBCallback(null);
@@ -64,6 +107,7 @@ class App extends React.Component {
         <CfgDialog open={this.state.cfgOpen} onRequestClose={(e)=>this.setState({cfgOpen:false})}/>
         <h1>Hello, Electron!</h1>
         <SyncPanel activeSync={this.state.activeSync} syncOk={this.state.syncOk}/>
+        <HallInfo male={1} female={5}/>
         <p>I hope you enjoy using basic-electron-react-boilerplate to start your dev off right!</p>
         <Button raised color="primary" onClick={(e)=>this.onButton(e)}>
           Primary
@@ -71,10 +115,14 @@ class App extends React.Component {
         <Button raised color="primary" onClick={(e)=>this.onCfgButton(e)}>
           Cfg
         </Button>
-        <AccessAlarmIcon/>
-        <FontAwesome spin={this.state.activeSync} className="text-danger" name="spinner" size="3x" />
+        <CoursesTree 
+          courses={this.state.coursesList} 
+          activeCourses={this.state.activeCourses} 
+          activeHostCourses={this.state.activeHostCourses} 
+          onActiveCourse={(id,state)=>this.handleActiveCourse(id,state)} 
+          onActiveHostCourse={(id,state)=>this.handleActiveHostCourse(id,state)} 
+          />
         <p> message: {this.state.message} </p>
-        <HallInfo male={1} female={5}/>
         <Display activeScan={true} message={this.state.message}/>
       </div>
     );

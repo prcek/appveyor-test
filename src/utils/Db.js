@@ -248,6 +248,7 @@ function findRefGid(ref_gid,callback) {
 
 function getCoursesTree(callback) {
     var tree = [];
+    console.log("getCoursesTree")
     getActivePairs().then((d)=>{
         pMap(d.pairs,(p)=>{
             return new Promise(function(resolve,reject){
@@ -260,10 +261,8 @@ function getCoursesTree(callback) {
                     }
                 });
             });
-        }).then(callback).catch(callback(null));
-    
-       
-    }).catch(callback(null));
+        }).then((list)=>callback(list)).catch((e)=>callback(null));
+    }).catch((e)=>callback(null));
 }
 
 

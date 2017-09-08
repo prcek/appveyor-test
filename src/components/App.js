@@ -2,7 +2,7 @@ import '../assets/css/App.css';
 import '../assets/css/font-awesome.css';
 import '../assets/css/font-roboto.css';
 
-import decode_card from '../utils/decode';
+import decode_card from '../utils/Decode';
 
 import React, { Component } from 'react';
 
@@ -15,21 +15,7 @@ import FontAwesome from 'react-fontawesome';
 import HallInfo from './HallInfo';
 import Display from './Display';
 
-
-var Datastore = require('nedb');
-
-
-var test_db = new Datastore({ filename: 'test.db', autoload: true });
-
-const pMap = require('p-map');
-var axios = require('axios');
-var remote_api = axios.create({
-  baseURL: 'https://jsonplaceholder.typicode.com/',
-  timeout: 5000,
-  headers: {'x-remoteapi-secret': 'supersecrettoken'}
-});
-
-
+import {startSync,stopSync,findRefGid,getCoursesTree} from '../utils/Db';
 
 
 class App extends React.Component {
@@ -41,10 +27,15 @@ class App extends React.Component {
   onButton(e) {
     console.log("button!");
     this.setState({message:'hello!'})
-    console.log(decode_card("TS*69626*eJyrVipLLVKyUgoJNlTSUcpMUbIyszQzMtNRKk5NLM7PA8oYGRia6xtaAGWT80uLilOBQiCleYm5IKZLYhlQE1B5aRFUJKbUwNDMoAREGSYVACmDVMM8kIrUCqBsrlItACfLIG4=*2933823073*302954397**"));
-    //remote_api.get("/todos").then(res=>{
-    //  this.setState({message:JSON.stringify(res)});
-    //});
+    //startSync();
+    //const dc = decode_card("TS*69626*eJyrVipLLVKyUgoJNlTSUcpMUbIyszQzMtNRKk5NLM7PA8oYGRia6xtaAGWT80uLilOBQiCleYm5IKZLYhlQE1B5aRFUJKbUwNDMoAREGSYVACmDVMM8kIrUCqBsrlItACfLIG4=*2933823073*302954397**");
+    //console.log(dc);
+    //findRefGid(dc.id,(res)=>{
+    //  console.log(res);
+    //})
+    getCoursesTree((tree)=>{
+      console.log(tree);
+    })
   }
   render() {
     return (

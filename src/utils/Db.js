@@ -126,7 +126,7 @@ function updateCourses(season,folder) {
     return new Promise(function(resolve,reject){
         remote_api.get("/courses/"+season._id+"/"+folder._id).then(res=>{
             pMap(res.data.courses.map(fixId),(x)=>insertOrUpdate(courses_db,x),{concurency:1}).then(r=>{resolve("ok")}).catch(reject);
-        })        
+        }).catch(reject);      
     });
 }
 
@@ -135,7 +135,7 @@ function updateStudents(course) {
         console.log("fetch students ",course._id,course.name)
         remote_api.get("/students/"+course._id).then(res=>{
             pMap(res.data.students.map(fixId),(x)=>insertOrUpdate(students_db,x),{concurency:1}).then(r=>{resolve("ok")}).catch(reject);
-        })         
+        }).catch(reject);         
     });
 }
 
@@ -154,7 +154,7 @@ function updateAllStudentsAndDeleteOld() {
                         resolve("ok");
                     }
                 });
-            })
+            }).catch(reject);
         });
     });
 }
@@ -222,6 +222,8 @@ function startSync(){
         syncIsOk = true;
         reportState();
     }).catch(e=>{
+
+        console.log("ERROR");
         syncIsRunning = false;
         syncIsOk = false;
         reportState();

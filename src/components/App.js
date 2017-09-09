@@ -14,6 +14,7 @@ import Grid from 'material-ui/Grid';
 import FontAwesome from 'react-fontawesome';
 import Typography from 'material-ui/Typography';
 import HallInfo from './HallInfo';
+import Clock from './Clock';
 import Display from './Display';
 import CfgDialog from './CfgDialog';
 import SyncPanel from './SyncPanel';
@@ -39,7 +40,7 @@ const styles  = theme => ({
     }
 });
 
-const heightSub = 200;
+const heightSub = 250;
 
 class App extends React.Component {
 
@@ -145,9 +146,18 @@ class App extends React.Component {
             <Button raised color="primary" onClick={(e)=>this.onTestSetupButton(e)}>TestSetup</Button>
             </Paper>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={4}>
           <Paper className={classes.gridPaper}>
-            <HallInfo male={1} female={5}/>
+            <Typography type="display3" align="center">
+              <Clock />
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={8}>
+          <Paper className={classes.gridPaper}>
+            <Typography type="display3" align="center">
+              <HallInfo male={1} female={5}/>
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={4}  >

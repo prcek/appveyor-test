@@ -14,28 +14,15 @@ const HallInfo = createReactClass({
         female: PropTypes.number.isRequired 
     },
 
-    getInitialState: function () {
-        return {
-          clock: new Date()
-        };
-    },
-    componentDidMount: function () {
-        this.clockInterval = setInterval(() => this.clockUpdate(), 200);
-    },
-    componentWillUnmount: function () {
-        clearInterval(this.clockInterval);
-    },
-
-    clockUpdate: function() {
-        this.setState({clock: new Date()});
-    },
+  
+  
 
     render: function() {
         return (
-            <div> HallInfo at {this.state.clock.toLocaleTimeString()} is 
-                &sum;: {this.props.male+this.props.female} 
-                <FontAwesome name={"male"}/>: {this.props.male} 
-                <FontAwesome name={"female"}/>: {this.props.female}
+            <div>  
+                <FontAwesome name={"male"}/> {this.props.male} &nbsp;
+                <FontAwesome name={"female"}/> {this.props.female}  &nbsp;
+                &sum; {this.props.male+this.props.female}  &nbsp;
             </div>
         )
     }

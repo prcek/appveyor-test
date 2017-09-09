@@ -13,6 +13,9 @@ class SyncPanel extends Component {
                 { (this.props.syncOk === false) && 
                     <FontAwesome className="text-danger" name="exclamation-triangle"/>
                 }
+                { (this.props.apiReady === true) && 
+                    <FontAwesome className="text-danger" name="wifi"/>
+                }
                 { (this.props.syncOk === true) && 
                     <FontAwesome className="text-danger" name="check"/>
                 }
@@ -24,7 +27,8 @@ class SyncPanel extends Component {
 
 SyncPanel.propTypes = {
     activeSync: PropTypes.bool.isRequired,
-    syncOk: PropTypes.bool
+    syncOk: PropTypes.bool,
+    apiReady: PropTypes.bool
 };
 
 

@@ -146,6 +146,9 @@ class CoursesDialog extends Component {
 
     handleDialogEnter() {
         console.log("handleDialogEnter");
+        const ac = this.props.activeCourses.map((c)=>{return c._id});
+        const ahc = this.props.activeHostCourses.map((c)=>{return c._id});
+        this.setState({activeCourses:ac,activeHostCourses:ahc});
     }
     handleDialogExit() {
         console.log("handleDialogExit");

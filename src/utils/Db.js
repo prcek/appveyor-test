@@ -29,6 +29,9 @@ var students_db = new Datastore({ filename: 'students.db', autoload: true });
 var stateCallBack = null;
 var syncIsRunning = false;
 var syncIsOk = null;
+var apiIsReady = null;
+
+
 
 
 function fixId(obj) {
@@ -271,7 +274,31 @@ function registerDBCallback(callback) {
 }
 
 function getSyncState() {
-    return {active:syncIsRunning,ok:syncIsOk};
+    return {active:syncIsRunning,ok:syncIsOk,apiReady:apiIsReady};
+}
+
+function startMonitor() {
+    setInterval(()=>{
+        remote_api.get("/ping").then(res=>{
+            apiIsReady = true;
+            reportState();
+        }).catch(err=>{
+            apiIsReady = false;
+            reportState();
+        })
+    },5000);
+}
+
+startMonitor();
+
+function getCourse(id,callback) {
+    courses_db.findOne({_id:id},function(err,doc){
+        if (err) {
+            callback(null);
+        } else {
+            callback(doc);
+        }
+    });
 }
 
 module.exports = {
@@ -280,6 +307,8 @@ module.exports = {
     registerDBCallback: registerDBCallback,
     getSyncState: getSyncState,
     findRefGid: findRefGid,
-    getCoursesTree: getCoursesTree
+    getCoursesTree: getCoursesTree,
+    getCourse: getCourse,
+
 }
   

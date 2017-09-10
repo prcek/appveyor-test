@@ -62,6 +62,10 @@ const styles  = theme => ({
 
 const heightSub = 300;
 
+//Node <script>document.write(process.versions.node)</script>,
+//Chromium <script>document.write(process.versions.chrome)</script>,
+//Electron <script>document.write(process.versions.electron)</script>,
+
 class App extends React.Component {
 
   constructor(props) {
@@ -206,9 +210,11 @@ class App extends React.Component {
             </Paper>
           </Grid>
           <Grid item xs={8} >
-            <Paper className={classes.gridPaper} style={{height: this.state.winHeight-heightSub}}>
-              <Display activeScan={true} message={this.state.message}/>
-            </Paper>
+            <Grid container align={'center'} justify={'center'} style={{height: this.state.winHeight-heightSub}}>
+               <Grid item>
+                  <Display activeScan={true} message={this.state.message}/>
+               </Grid >
+            </Grid>
           </Grid>
           <Grid item xs={12}>
             <Paper  className={classes.gridPaper}>

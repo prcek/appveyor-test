@@ -1,6 +1,6 @@
 'use strict';
 // Import parts of electron to use
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('path')
 const url = require('url')
 
@@ -75,5 +75,24 @@ app.on('activate', () => {
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
     createWindow();
+  }
+});
+
+
+ipcMain.on('rr', (event, payload) => {
+  switch(payload.action) {
+      case "quit": 
+          app.quit(); 
+      break;
+      case "togglefs": 
+          if (mainWindow) {
+              mainWindow.setFullScreen(!mainWindow.isFullScreen());
+          }
+      break;
+      case "devtools": 
+          if (mainWindow) {
+              mainWindow.webContents.openDevTools()
+          }
+      break;
   }
 });

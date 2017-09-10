@@ -21,26 +21,46 @@ import SyncPanel from './SyncPanel';
 import CoursesDialog from './CoursesDialog';
 import CoursesChips from './CoursesChips';
 
+import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 
 import {startSync,stopSync,findRefGid,getCoursesTree,registerDBCallback,getSyncState,getCourse} from '../utils/Db';
+import ECom from '../utils/ECom';
 
+
+
+const muitheme = createMuiTheme({
+  palette: {
+    type: 'dark', // Switching the dark mode on is a single property value change.
+  },
+  typography: {
+    display3: {
+      color: 'rgba(255, 255, 255, 1)'
+    }
+  }
+});
 
 const styles  = theme => ({ 
     full: {
       //height: '95vh'  
     },
     gridContainer: {
-      border: '1px solid black',
+      border: '1px solid red',
     },
     gridItem: {
-      border: '1px solid red',
+      border: '1px solid blue',
     },
     gridPaper: {
       //overflow: 'scroll'
+    },
+    gridSeparator: {
+      background: 'white',
+      height: '2px',
+      margin: '0px',
+      paggind: '0px'
     }
 });
 
-const heightSub = 250;
+const heightSub = 300;
 
 class App extends React.Component {
 
@@ -58,19 +78,11 @@ class App extends React.Component {
       winHeight: 500,
       winWidth: 500,
     };
+    this.updateDimensions = this.updateDimensions.bind(this);
   }
-  onButton(e) {
-    console.log("button!");
-    this.setState({message:'hello!'})
+  onSyncButton(e) {
+    console.log("sync button!");
     startSync();
-    //const dc = decode_card("TS*69626*eJyrVipLLVKyUgoJNlTSUcpMUbIyszQzMtNRKk5NLM7PA8oYGRia6xtaAGWT80uLilOBQiCleYm5IKZLYhlQE1B5aRFUJKbUwNDMoAREGSYVACmDVMM8kIrUCqBsrlItACfLIG4=*2933823073*302954397**");
-    //console.log(dc);
-    //findRefGid(dc.id,(res)=>{
-    //  console.log(res);
-    //})
-    getCoursesTree((tree)=>{
-      console.log(tree);
-    })
   }
 
   onCfgButton(e) {
@@ -81,6 +93,16 @@ class App extends React.Component {
   onCoursesButton(e) {
     console.log("courses button!");
     this.setState({coursesOpen:true})
+  }
+
+  onFullScreenButton(e) {
+    console.log("fullscreen button!");
+    ECom.toggleFullScreen();
+  }
+
+  onDevToolButton(e) {
+    console.log("devtool button!");
+    ECom.openDevTools();
   }
 
   onTestSetupButton(e) {
@@ -102,7 +124,7 @@ class App extends React.Component {
  
   componentDidMount() {
     this.updateDimensions();
-    window.addEventListener("resize", this.updateDimensions.bind(this));
+    window.addEventListener("resize", this.updateDimensions);
 
     registerDBCallback((e)=>{this.onDBChange(e)});
     this.setState({activeSync:getSyncState().active, syncOk:getSyncState().ok});
@@ -112,7 +134,7 @@ class App extends React.Component {
     })
   }
   componentWillUnmount() {
-    window.removeEventListener("resize", this.updateDimensions.bind(this));
+    window.removeEventListener("resize", this.updateDimensions);
     registerDBCallback(null);
   }
 
@@ -127,58 +149,74 @@ class App extends React.Component {
   render() {
     const classes = this.props.classes;
     return (
-      <Grid container className={classes.gridContainer}>
-        <Grid item xs={12}>
-          <Paper className={classes.gridPaper}>
-            <CfgDialog open={this.state.cfgOpen} onRequestClose={(e)=>this.setState({cfgOpen:false})}/>
-            <CoursesDialog 
-              open={this.state.coursesOpen} 
-              onRequestClose={(e)=>this.setState({coursesOpen:false})}
-              courses={this.state.coursesList}
-              activeCourses = {this.state.activeCourses}
-              activeHostCourses = {this.state.activeHostCourses}
-              onSave={(courses,hosts)=>this.handleActiveCoursesList(courses,hosts)}
-            />   
-            <SyncPanel activeSync={this.state.activeSync} syncOk={this.state.syncOk} apiReady={this.state.apiReady}/>
-            <Button raised color="primary" onClick={(e)=>this.onButton(e)}>Primary</Button>
-            <Button raised color="primary" onClick={(e)=>this.onCfgButton(e)}>Cfg</Button>
-            <Button raised color="primary" onClick={(e)=>this.onCoursesButton(e)}>Courses</Button>
-            <Button raised color="primary" onClick={(e)=>this.onTestSetupButton(e)}>TestSetup</Button>
+      <MuiThemeProvider theme={muitheme}>
+        <Grid container className={classes.gridContainer}>
+          <Grid item xs={4}>
+            <Paper className={classes.gridPaper}>
+              <SyncPanel activeSync={this.state.activeSync} syncOk={this.state.syncOk} apiReady={this.state.apiReady}/>
             </Paper>
+          </Grid>
+          <Grid item xs={8}>
+            <Paper className={classes.gridPaper}>
+              <CfgDialog open={this.state.cfgOpen} onRequestClose={(e)=>this.setState({cfgOpen:false})}/>
+              <CoursesDialog 
+                open={this.state.coursesOpen} 
+                onRequestClose={(e)=>this.setState({coursesOpen:false})}
+                courses={this.state.coursesList}
+                activeCourses = {this.state.activeCourses}
+                activeHostCourses = {this.state.activeHostCourses}
+                onSave={(courses,hosts)=>this.handleActiveCoursesList(courses,hosts)}
+              />   
+              <Button raised color="primary" onClick={(e)=>this.onSyncButton(e)}>Sync</Button>
+              <Button raised color="primary" onClick={(e)=>this.onCfgButton(e)}>Cfg</Button>
+              <Button raised color="primary" onClick={(e)=>this.onCoursesButton(e)}>Courses</Button>
+              <Button raised color="primary" onClick={(e)=>this.onTestSetupButton(e)}>TestSetup</Button>
+              <Button raised color="primary" onClick={(e)=>this.onFullScreenButton(e)}>FullScreen</Button>
+              <Button raised color="primary" onClick={(e)=>this.onDevToolButton(e)}>DevTool</Button>
+              </Paper>
+          </Grid>
+          <Grid item xs={12}>
+            <div className={classes.gridSeparator}/>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper className={classes.gridPaper}>
+              <Typography type="display3" align="center">
+                <Clock />
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={8}>
+            <Paper className={classes.gridPaper}>
+              <Typography type="display3" align="center">
+                <HallInfo male={1} female={5}/>
+              </Typography>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12}>
+            <div className={classes.gridSeparator}/>
+          </Grid>
+
+          <Grid item xs={4}  >
+            <Paper className={classes.gridPaper} style={{overflow: 'scroll', height: this.state.winHeight-heightSub}}>
+              <Typography type="headline" align="center"> Vstup pro kurz </Typography>
+              <CoursesChips courses={this.state.activeCourses} />
+              <Typography type="headline" align="center"> Hostování z kurzů </Typography>
+              <CoursesChips courses={this.state.activeHostCourses} />
+            </Paper>
+          </Grid>
+          <Grid item xs={8} >
+            <Paper className={classes.gridPaper} style={{height: this.state.winHeight-heightSub}}>
+              <Display activeScan={true} message={this.state.message}/>
+            </Paper>
+          </Grid>
+          <Grid item xs={12}>
+            <Paper  className={classes.gridPaper}>
+              <p> message: {this.state.message} </p>
+            </Paper>
+          </Grid>
         </Grid>
-        <Grid item xs={4}>
-          <Paper className={classes.gridPaper}>
-            <Typography type="display3" align="center">
-              <Clock />
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={8}>
-          <Paper className={classes.gridPaper}>
-            <Typography type="display3" align="center">
-              <HallInfo male={1} female={5}/>
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={4}  >
-          <Paper className={classes.gridPaper} style={{overflow: 'scroll', height: this.state.winHeight-heightSub}}>
-            <Typography type="headline" align="center"> Vstup pro kurz </Typography>
-            <CoursesChips courses={this.state.activeCourses} />
-            <Typography type="headline" align="center"> Hostování z kurzů </Typography>
-            <CoursesChips courses={this.state.activeHostCourses} />
-          </Paper>
-        </Grid>
-        <Grid item xs={8} >
-          <Paper className={classes.gridPaper} style={{height: this.state.winHeight-heightSub}}>
-            <Display activeScan={true} message={this.state.message}/>
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper  className={classes.gridPaper}>
-            <p> message: {this.state.message} </p>
-          </Paper>
-        </Grid>
-      </Grid>
+      </MuiThemeProvider>
     );
   }
 }

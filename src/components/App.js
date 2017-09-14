@@ -20,6 +20,7 @@ import CfgDialog from './CfgDialog';
 import SyncPanel from './SyncPanel';
 import CoursesDialog from './CoursesDialog';
 import CoursesChips from './CoursesChips';
+import ScanLine from './ScanLine';
 
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 
@@ -218,6 +219,7 @@ class App extends React.Component {
           </Grid>
           <Grid item xs={12}>
             <Paper  className={classes.gridPaper}>
+              <ScanLine active={!(this.state.cfgOpen || this.state.coursesOpen)}/>
               <p> message: {this.state.message} </p>
             </Paper>
           </Grid>

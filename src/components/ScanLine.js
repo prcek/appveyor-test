@@ -14,11 +14,28 @@ class ScanLine extends Component {
         this.timerId = null;
     }
 
-    _handleKeyPress(e) {
+    componentDidMount() {
+        this.clockInterval = setInterval(() => this.onTick(), 1000);
+    }
+    componentWillUnmount() {
+        clearInterval(this.clockInterval);
+    }
+
+    onTick() {
+        if (this.props.active && !this.state.focused) {
+            console.log("focus fix");
+            this.inputNode.focus();
+            const len = this.inputNode.value.length;
+            this.inputNode.setSelectionRange(len, len);
+        }
+    }
+
+    handleKeyPress(e) {
         if (e.key === 'Enter') {
           console.log('Enter');
-        } else {
-          console.log("Key")
+          this.setState({value:""});
+        //} else {
+        //  console.log("Key")
         }
     }
     
@@ -34,10 +51,11 @@ class ScanLine extends Component {
         return (
             <div>   
                 <input 
+                    ref={(input) => { this.inputNode = input; }} 
                     type='text' 
                     value={this.state.value} 
                     onChange={event => this.setState({ value: event.target.value })}
-                    onKeyPress={event=> this._handleKeyPress(event)}
+                    onKeyPress={event=> this.handleKeyPress(event)}
                     onBlur={()=>this.onBlur()}
                     onFocus={()=>this.onFocus()}
                 />, 

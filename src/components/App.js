@@ -2,7 +2,6 @@ import '../assets/css/App.css';
 import '../assets/css/font-awesome.css';
 import '../assets/css/font-roboto.css';
 
-import decode_card from '../utils/Decode';
 
 import React, { Component } from 'react';
 
@@ -73,6 +72,7 @@ class App extends React.Component {
     super(props);
     this.state = { 
       message: "hi!", 
+      message_type: "init",
       activeSync: false, 
       syncOk:null, 
       cfgOpen: false, 
@@ -84,6 +84,8 @@ class App extends React.Component {
       winWidth: 500,
     };
     this.updateDimensions = this.updateDimensions.bind(this);
+    this.hideTimeout = null;
+    this.flashTimeout = null;
   }
   onSyncButton(e) {
     console.log("sync button!");
@@ -118,7 +120,7 @@ class App extends React.Component {
   }
 
   onDBChange(e) {
-    console.log("onDBChange",e)
+    //console.log("onDBChange",e)
     this.setState({activeSync:e.active,syncOk:e.ok,apiReady:e.apiReady});
   } 
 
@@ -148,7 +150,51 @@ class App extends React.Component {
     this.setState({ winWidth: window.innerWidth, winHeight: window.innerHeight });
   }
 
+  restartHideTimeout() {
+    if (this.hideTimeout !== null) {
+      clearTimeout(this.hideTimeout);
+    }
+    this.hideTimeout = setTimeout(()=>{
+      this.hideTimeout = null;
+      this.setState({message:"",message_type:"idle"})
+    },3000)
+  }
+  restartFlashTimeout() {
+    if (this.flashTimeout !== null) {
+      clearTimeout(this.flashTimeout);
+    }
+    this.flashTimeout = setTimeout(()=>{
+      this.flashTimeout = null;
+      this.setState({message_flash:false})
+    },100)
+  }
 
+
+  showMsg(msg,type) {
+    this.setState({message: msg, message_type:type,message_flash:true})
+    this.restartFlashTimeout();
+    this.restartHideTimeout();
+  }
+
+  onScanStudent(card,student,raw_data) {
+    console.log("onScanStudent",card,student);
+    if (student === null) {
+      this.showMsg("neznámý žák","error");
+      return;
+    } 
+    
+  }
+  onScanCmd(cmd,course,raw_data) {
+    console.log("onScanCmd",cmd,course);
+    if (course === null) {
+      this.showMsg("neznámý kurz","error");
+      return;
+    } 
+  }
+  onScanError(msg,raw_data) {
+    console.log("onScanError",msg);
+    this.showMsg(msg,"error");
+  }
 
 
   render() {
@@ -213,14 +259,18 @@ class App extends React.Component {
           <Grid item xs={8} >
             <Grid container align={'center'} justify={'center'} style={{height: this.state.winHeight-heightSub}}>
                <Grid item>
-                  <Display activeScan={true} message={this.state.message}/>
+                  <Display flash={this.state.message_flash} message={this.state.message} message_type={this.state.message_type}/>
                </Grid >
             </Grid>
           </Grid>
           <Grid item xs={12}>
             <Paper  className={classes.gridPaper}>
-              <ScanLine active={!(this.state.cfgOpen || this.state.coursesOpen)}/>
-              <p> message: {this.state.message} </p>
+              <ScanLine 
+                active={!(this.state.cfgOpen || this.state.coursesOpen)}
+                onScanStudent = {(card,st,rd)=>this.onScanStudent(card,st,rd)}
+                onScanCmd = {(cmd,c,rd)=>this.onScanCmd(cmd,c,rd)}
+                onScanError = {(msg,rd)=>this.onScanError(msg,rd)}
+              />
             </Paper>
           </Grid>
         </Grid>
@@ -228,13 +278,5 @@ class App extends React.Component {
     );
   }
 }
-
-/*
- <Display activeScan={true} message={this.state.message}/>
- <CoursesChips courses={this.state.activeHostCourses} />
- <CoursesChips courses={this.state.activeCourses} />
- <HallInfo male={1} female={5}/>
-
-*/
 
 export default withStyles(styles)(App);

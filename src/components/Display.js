@@ -5,51 +5,51 @@ import PropTypes from 'prop-types';
 import Typography from 'material-ui/Typography';
 import FontAwesome from 'react-fontawesome';
 
-class Message extends Component {
-    render() {
-            return (
-                <span> message {this.props.text} {this.props.show ? "yes":"no"} </span>
-            )
-    };
-}
-
-Message.propTypes = {
-    show: PropTypes.bool.isRequired,
-    text: PropTypes.string.isRequired
-};
-
 
 class Display extends Component {
     constructor(props) {
         super(props);
-        this.state = {lastUpdate: 0, messageShow: true};
-        this.timerId = null;
     }
 
-
-    componentWillReceiveProps(nextProps) {
-        console.log("new props");
-        if (this.timerId) {
-            clearTimeout(this.timerId);
-        }
-        this.setState({messageShow:true, lastUpdate: new Date()});
-        this.timerId=setTimeout(()=>{
-            this.setState({messageShow:false});
-        }, this.props.messageHideTimeout);
-    }
-
-    render() {
+    renderFlash() {
         return (
             <div>
                 <Typography type="display4" align="center"> 
-                    <FontAwesome name={"shower"}/> <FontAwesome name={"qrcode"}/> 
+                    <FontAwesome name="bullseye" style={{color:"white"}}/>
+                </Typography>
+            </div>
+        )
+    }
+ 
+    renderMsg() {
+        var icon_name = "bug";
+        var icon_color = "gray";
+        switch(this.props.message_type) {
+            case "error": icon_name = "warning"; icon_color="red"; break;
+            case "setup": icon_name = "wrench"; icon_color="white"; break;
+            case "init":  icon_name = "thumbs-o-up"; icon_color="white"; break;
+        }
+        return (
+            <div>
+                { this.props.flash && <p style={{color:"red"}}> active </p>}
+                <Typography type="display4" align="center"> 
+                    <FontAwesome name={icon_name} style={{color:icon_color}}/>
                 </Typography>
                 <Typography type="display2" align="center"> 
-                    jmeno
+                    {this.props.message}
                 </Typography>
             </div>
         )
     };
+
+    render() {
+        if (this.props.flash) {
+            return this.renderFlash();
+        } else {
+            return this.renderMsg();
+        }
+    }
+        
 }
 
 /*
@@ -67,9 +67,9 @@ Display.defaultProps = {
 };
 
 Display.propTypes = {
-    activeScan: PropTypes.bool,
+    flash: PropTypes.bool,
     message: PropTypes.string,
-    messageHideTimeout: PropTypes.number.isRequired
+    message_type: PropTypes.string,
 };
 
 

@@ -243,7 +243,7 @@ function findRefGid(ref_gid,callback) {
             console.log("find err",err);
             callback(null);
         } else {
-            console.log("found");
+            console.log("find res", doc !== null);
             callback(doc);    
         }
     });

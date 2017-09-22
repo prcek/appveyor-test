@@ -33,7 +33,7 @@ class CoursesChips extends Component {
     renderChip(c) {
         const classes = this.props.classes;
         return (
-            <Chip key={c._id} label={c.code + " - " +c.name} className={classes.chip} 
+            <Chip key={c._id} label={c.code} className={classes.chip} 
                 //avatar={<Avatar>{c.code}</Avatar>}
             />   
         )

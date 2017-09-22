@@ -28,6 +28,7 @@ class Display extends Component {
             case "error": icon_name = "warning"; icon_color="red"; break;
             case "setup": icon_name = "wrench"; icon_color="white"; break;
             case "init":  icon_name = "thumbs-o-up"; icon_color="white"; break;
+            case "idle":  icon_name = "search"; icon_color="gray"; break;
         }
         return (
             <div>

@@ -301,6 +301,17 @@ function getCourse(id,callback) {
     });
 }
 
+function getCourses(season_key, folder_key,callback) {
+    courses_db.find({folder_key:folder_key, season_key:season_key},function(err,docs){
+        if (err) {
+            callback(null);
+        } else {
+            callback(docs);
+        }
+    });
+}
+
+
 module.exports = {
     startSync:startSync,
     stopSync:stopSync,
@@ -309,6 +320,7 @@ module.exports = {
     findRefGid: findRefGid,
     getCoursesTree: getCoursesTree,
     getCourse: getCourse,
+    getCourses: getCourses,
 
 }
   

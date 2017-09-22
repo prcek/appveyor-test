@@ -23,7 +23,7 @@ import ScanLine from './ScanLine';
 
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 
-import {startSync,stopSync,findRefGid,getCoursesTree,registerDBCallback,getSyncState,getCourse} from '../utils/Db';
+import {startSync,stopSync,findRefGid,getCoursesTree,registerDBCallback,getSyncState,getCourse, getCourses} from '../utils/Db';
 import ECom from '../utils/ECom';
 
 
@@ -78,7 +78,8 @@ class App extends React.Component {
       cfgOpen: false, 
       coursesOpen: false, 
       activeCourses:[], 
-      activeHostCourses:[], 
+      activeHostMCourses:[], 
+      activeHostFCourses:[], 
       coursesList:[],
       winHeight: 500,
       winWidth: 500,
@@ -124,9 +125,9 @@ class App extends React.Component {
     this.setState({activeSync:e.active,syncOk:e.ok,apiReady:e.apiReady});
   } 
 
-  handleActiveCoursesList(courses,hosts) {
+  handleActiveCoursesList(courses,mhosts,fhosts) {
     console.log("handleActiveCoursesList")
-    this.setState({activeCourses:courses,activeHostCourses:hosts})
+    this.setState({activeCourses:courses,activeHostMCourses:mhosts,activeHostFCourses:fhosts})
   }
  
   componentDidMount() {
@@ -184,12 +185,60 @@ class App extends React.Component {
     } 
     
   }
+
+  isCourseInActive(list,course) {
+    const fc = list.find((c)=>{
+      return (c._id === course._id);
+    })
+    return fc !== undefined;
+  }
+
   onScanCmd(cmd,course,raw_data) {
     console.log("onScanCmd",cmd,course);
     if (course === null) {
       this.showMsg("neznámý kurz","error");
       return;
     } 
+    console.log(cmd.id);
+    switch(cmd.id) {
+      case "C_SETUP":
+        this.setState({activeCourses:[course]});
+        this.showMsg("nastaven kurz","setup");
+      break;
+      case "C_SETUP_GM":
+        getCourses(course.season_key, course.folder_key, (list)=>{
+          console.log("MHost list:",list);
+          this.setState({activeCourses:[course], activeHostMCourses:list});
+          this.showMsg("nastaven kurz + hostování","setup");
+        });
+      break;
+      case "C_ADD":
+        if (this.isCourseInActive(this.state.activeCourses,course)) {
+          this.showMsg("kurz je již vybrán","error"); 
+        } else {
+          this.setState({activeCourses:[...this.state.activeCourses,course]});
+          this.showMsg("pridan kurz","setup");
+        }
+      break;
+      case "C_ADD_M":
+        if (this.isCourseInActive(this.state.activeHostMCourses,course)) {
+          this.showMsg("kurz je již vybrán","error"); 
+        } else {
+          this.setState({activeHostMCourses:[...this.state.activeHostMCourses,course]});
+          this.showMsg("pridan kurz","setup");
+        }
+      break;
+      case "C_ADD_F":
+        if (this.isCourseInActive(this.state.activeHostFCourses,course)) {
+          this.showMsg("kurz je již vybrán","error"); 
+        } else {
+          this.setState({activeHostFCourses:[...this.state.activeHostFCourses,course]});
+          this.showMsg("pridan kurz","setup");
+        }
+      break;
+      default:
+        this.showMsg("neznámá ovládací karta","error"); 
+    }
   }
   onScanError(msg,raw_data) {
     console.log("onScanError",msg);
@@ -215,8 +264,9 @@ class App extends React.Component {
                 onRequestClose={(e)=>this.setState({coursesOpen:false})}
                 courses={this.state.coursesList}
                 activeCourses = {this.state.activeCourses}
-                activeHostCourses = {this.state.activeHostCourses}
-                onSave={(courses,hosts)=>this.handleActiveCoursesList(courses,hosts)}
+                activeHostMCourses = {this.state.activeHostMCourses}
+                activeHostFCourses = {this.state.activeHostFCourses}
+                onSave={(courses,mhosts,fhosts)=>this.handleActiveCoursesList(courses,mhosts,fhosts)}
               />   
               <Button raised color="primary" onClick={(e)=>this.onSyncButton(e)}>Sync</Button>
               <Button raised color="primary" onClick={(e)=>this.onCfgButton(e)}>Cfg</Button>
@@ -250,10 +300,13 @@ class App extends React.Component {
 
           <Grid item xs={4}  >
             <Paper className={classes.gridPaper} style={{overflow: 'scroll', height: this.state.winHeight-heightSub}}>
-              <Typography type="headline" align="center"> Vstup pro kurz </Typography>
+              { this.state.activeCourses.length==0 && <Typography type="headline" align="center"> Není zvolen kurz pro vstup </Typography>}
+              { this.state.activeCourses.length>0 && <Typography type="headline" align="center"> Vstup pro kurz </Typography>}
               <CoursesChips courses={this.state.activeCourses} />
-              <Typography type="headline" align="center"> Hostování z kurzů </Typography>
-              <CoursesChips courses={this.state.activeHostCourses} />
+              { this.state.activeHostMCourses.length>0 && <Typography type="headline" align="center"> Hostování kluci </Typography>}
+              <CoursesChips courses={this.state.activeHostMCourses} />
+              { this.state.activeHostFCourses.length>0 && <Typography type="headline" align="center"> Hostování holky </Typography>}
+              <CoursesChips courses={this.state.activeHostFCourses} />
             </Paper>
           </Grid>
           <Grid item xs={8} >

@@ -64,8 +64,11 @@ class CoursesTree extends Component {
     handleCheck(n,checked) {
         this.props.onActiveCourse(n._id,checked);
     }
-    handleCheckHost(n,checked) {
-        this.props.onActiveHostCourse(n._id,checked);
+    handleCheckHostM(n,checked) {
+        this.props.onActiveHostMCourse(n._id,checked);
+    }
+    handleCheckHostF(n,checked) {
+        this.props.onActiveHostFCourse(n._id,checked);
     }
 
 
@@ -81,16 +84,25 @@ class CoursesTree extends Component {
                                 onChange={(event, checked) => this.handleCheck(c,checked)}
                             />
                         }
-                        label="Vstup"
+                        label="Vsichni"
                     />
                     <FormControlLabel
                         control={
                             <Switch
-                                checked={this.props.activeHostCourses.indexOf(c._id) !== -1}
-                                onChange={(event, checked) => this.handleCheckHost(c,checked)}
+                                checked={this.props.activeHostMCourses.indexOf(c._id) !== -1}
+                                onChange={(event, checked) => this.handleCheckHostM(c,checked)}
                            />
                         }
-                        label="Hostování"
+                        label="Kluci"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={this.props.activeHostFCourses.indexOf(c._id) !== -1}
+                                onChange={(event, checked) => this.handleCheckHostF(c,checked)}
+                           />
+                        }
+                        label="Holky"
                     />
                 </ListItemSecondaryAction>
             </ListItem> 
@@ -131,9 +143,11 @@ class CoursesTree extends Component {
 CoursesTree.propTypes = {
     courses: PropTypes.array.isRequired,
     activeCourses: PropTypes.array.isRequired,
-    activeHostCourses: PropTypes.array.isRequired,
+    activeHostMCourses: PropTypes.array.isRequired,
+    activeHostFCourses: PropTypes.array.isRequired,
     onActiveCourse: PropTypes.func.isRequired,
-    onActiveHostCourse: PropTypes.func.isRequired
+    onActiveHostMCourse: PropTypes.func.isRequired,
+    onActiveHostFCourse: PropTypes.func.isRequired
 };
 
 
@@ -141,14 +155,15 @@ class CoursesDialog extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { activeCourses: [], activeHostCourses: []};
+        this.state = { activeCourses: [], activeHostMCourses: [], activeHostFCourses: []};
     }
 
     handleDialogEnter() {
         console.log("handleDialogEnter");
         const ac = this.props.activeCourses.map((c)=>{return c._id});
-        const ahc = this.props.activeHostCourses.map((c)=>{return c._id});
-        this.setState({activeCourses:ac,activeHostCourses:ahc});
+        const ahmc = this.props.activeHostMCourses.map((c)=>{return c._id});
+        const ahfc = this.props.activeHostFCourses.map((c)=>{return c._id});
+        this.setState({activeCourses:ac,activeHostMCourses:ahmc,activeHostFCourses:ahfc});
     }
     handleDialogExit() {
         console.log("handleDialogExit");
@@ -162,8 +177,9 @@ class CoursesDialog extends Component {
             }
         }
         const ac = courses.filter((c)=>{return this.state.activeCourses.indexOf(c._id)!=-1});
-        const ahc = courses.filter((c)=>{return this.state.activeHostCourses.indexOf(c._id)!=-1});
-        this.props.onSave(ac,ahc);
+        const ahmc = courses.filter((c)=>{return this.state.activeHostMCourses.indexOf(c._id)!=-1});
+        const ahfc = courses.filter((c)=>{return this.state.activeHostFCourses.indexOf(c._id)!=-1});
+        this.props.onSave(ac,ahmc,ahfc);
         this.props.onRequestClose(e);
     }
 
@@ -188,25 +204,44 @@ class CoursesDialog extends Component {
     
       }
     
-      handleActiveHostCourse(id,state) {
-        console.log("handleActiveHostCourse",id,state);
+      handleActiveHostMCourse(id,state) {
+        console.log("handleActiveHostMCourse",id,state);
     
-        const { activeHostCourses } = this.state;
-        const currentIndex = activeHostCourses.indexOf(id);
-        const newActiveHostCourses = [...activeHostCourses];
+        const { activeHostMCourses } = this.state;
+        const currentIndex = activeHostMCourses.indexOf(id);
+        const newActiveHostMCourses = [...activeHostMCourses];
     
         if (currentIndex === -1) {
-          newActiveHostCourses.push(id);
+          newActiveHostMCourses.push(id);
         } else {
-          newActiveHostCourses.splice(currentIndex, 1);
+          newActiveHostMCourses.splice(currentIndex, 1);
         }
     
         this.setState({
-          activeHostCourses: newActiveHostCourses,
+          activeHostMCourses: newActiveHostMCourses,
         });
     
       }
+
+      handleActiveHostFCourse(id,state) {
+        console.log("handleActiveFHostCourse",id,state);
     
+        const { activeHostFCourses } = this.state;
+        const currentIndex = activeHostFCourses.indexOf(id);
+        const newActiveHostFCourses = [...activeHostFCourses];
+    
+        if (currentIndex === -1) {
+          newActiveHostFCourses.push(id);
+        } else {
+          newActiveHostFCourses.splice(currentIndex, 1);
+        }
+    
+        this.setState({
+          activeHostFCourses: newActiveHostFCourses,
+        });
+    
+      }
+      
     render() {
         const { classes } = this.props;
         return (
@@ -236,9 +271,11 @@ class CoursesDialog extends Component {
                     classes={classes}
                     courses={this.props.courses}
                     activeCourses={this.state.activeCourses}
-                    activeHostCourses={this.state.activeHostCourses}
+                    activeHostMCourses={this.state.activeHostMCourses}
+                    activeHostFCourses={this.state.activeHostFCourses}
                     onActiveCourse={(id,state)=>this.handleActiveCourse(id,state)}
-                    onActiveHostCourse={(id,state)=>this.handleActiveHostCourse(id,state)}
+                    onActiveHostMCourse={(id,state)=>this.handleActiveHostMCourse(id,state)}
+                    onActiveHostFCourse={(id,state)=>this.handleActiveHostFCourse(id,state)}
                 />
                
 
@@ -255,7 +292,8 @@ CoursesDialog.propTypes = {
     onRequestClose: PropTypes.func.isRequired,
     courses: PropTypes.array.isRequired,
     activeCourses: PropTypes.array.isRequired,
-    activeHostCourses: PropTypes.array.isRequired,
+    activeHostMCourses: PropTypes.array.isRequired,
+    activeHostFCourses: PropTypes.array.isRequired,
     onSave: PropTypes.func.isRequired
 };
 

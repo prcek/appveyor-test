@@ -13,6 +13,10 @@ import {findRefGid,getCourse} from '../utils/Db';
 const fakeCard1 = "TS*47707*eJyrViouLcpLzE1VslJQikosyEktScxR0lFQgol5JWaXJoEEilMTi/PzQEJGBoYG+oaGEMEKkEguiJ2cX1pUDNYDlipLLQKxQ4LBvMwUIMfE3NzAvBYAfNMeyA==*3370528772*1972071602**";
 const fakeCard2 = "TS_CMD*eJyrVkrOLy0qTo3PTFGyUlBKTC+oSssLqvKJKMhIds+pSs7w9XFNj3JJMg6rTDYKjUz3dHa08I13qUpP91XSUYBpzkvMTQVpr4opNTBINczOSUzJAzNTFIpLgAxDU8vUlHwQw8wwOz+nOBssaalQkpiXChI1gClHMjM5PwVsphFIrCy1CMQOCTYE8SBudY4Pdg0JDVCqBQAw3T4N*685749921**";
 const fakeCard3 = "TS_CMD*eJyrVipLLVKyUgoJNlTSUcpMATKd44NdQ0IDgNzk/NKi4tR4sGhiekFVWl5QlU9EQUaye05Vcoavj2t6lEuScVhlslFoZLqns6NRQKpLZnq+L0Jrcn5KKlCzIUIkLzEXJFIVU2pgkGqYnZOYkgdmpigUlwAZhqaWqSn5IIaZYXZ+TnE2WNJSoSQxLxUkagBTrlQLABFlPOY=*3846057001**";
+const fakeCard4 = "TS_CMD*eJyrVipLLVKyUgoJNlTSUcpMATKd44NdQ0ID4t19gSLJ+aVFxanxYInE9IKqtLygKp+Igoxk95yq5AxfH9f0KJck47DKZKPQyHRPZ0ejgFSXzPR8JK3J+SmpQM2GCJG8xFyQSFVMqYFBqmF2TmJKHpiZolBcAmQYmlqmpuSDGGaG2fk5xdlgSUuFksS8VJCoAUy5Ui0Awb092Q==*3427684786**";
+const fakeCard5 = "TS_CMD*eJyrVipLLVKyUgoJNlTSUcpMATKd4x1dXICc5PzSouLUeLBYYnpBVVpeUJVPREFGsntOVXKGr49repRLknFYZbJRaGS6p7OjUUCqS2Z6vi9Ca3J+SipQsyFCJC8xFyRSFVNqYJBqmJ2TmJIHZqYoFJcAGYamlqkp+SCGmWF2fk5xNljSUqEkMS8VJGoAU65UCwCFODwe*2616170447**";
+const fakeCard6 = "TS_CMD*eJyrVipLLVKyUgoJNlTSUcpMATKd4x1dXOJ9gdzk/NKi4tR4sGhiekFVWl5QlU9EQUaye05Vcoavj2t6lEuScVhlslFoZLqns6NRQKpLZno+ktbk/JRUoGZDhEheYi5IpCqm1MAg1TA7JzElD8xMUSguATIMTS1TU/JBDDPD7Pyc4mywpKVCSWJeKkjUAKZcqRYA/z08yg==*377203085**";
+const fakeCard7 = "TS_CMD*eJyrVipLLVKyUgoJNlTSUcpMATKd4x1dXOLdgNzk/NKi4tR4sGhiekFVWl5QlU9EQUaye05Vcoavj2t6lEuScVhlslFoZLqns6NRQKpLZnq+L0Jrcn5KKlCzIUIkLzEXJFIVU2pgkGqYnZOYkgdmpigUlwAZhqaWqSn5IIaZYXZ+TnE2WNJSoSQxLxUkagBTrlQLAPrPPMM=*4290452104**";
 
 class ScanLine extends Component {
     constructor(props) {
@@ -104,7 +108,7 @@ class ScanLine extends Component {
                 active: {this.props.active?"yes":"no"} typing: {this.state.typing? "yes":"no"} focus: {this.state.focused? "yes":"no"}
                 <br/>
                 <Button onClick={(e)=>this.onFakeCard(e,fakeCard1)}>TSCard_st</Button>
-                <Button onClick={(e)=>this.onFakeCard(e,fakeCard2)}>TSCard_cmd</Button>
+                <Button onClick={(e)=>this.onFakeCard(e,fakeCard7)}>TSCard_cmd</Button>
             </div>
         )
     };

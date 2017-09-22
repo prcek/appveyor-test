@@ -80,6 +80,7 @@ class App extends React.Component {
       activeCourses:[], 
       activeHostMCourses:[], 
       activeHostFCourses:[], 
+      activeStudents:[],
       coursesList:[],
       winHeight: 500,
       winWidth: 500,
@@ -101,6 +102,11 @@ class App extends React.Component {
   onCoursesButton(e) {
     console.log("courses button!");
     this.setState({coursesOpen:true})
+  }
+
+  onResetButton(e) {
+    console.log("reset button!");
+    this.setState({activeStudents:[]})
   }
 
   onFullScreenButton(e) {
@@ -177,16 +183,47 @@ class App extends React.Component {
     this.restartHideTimeout();
   }
 
-  onScanStudent(card,student,raw_data) {
-    console.log("onScanStudent",card,student);
+  onScanStudent(card,student,course,raw_data) {
+    console.log("onScanStudent",card,student,course);
     if (student === null) {
       this.showMsg("neznámý žák","error");
       return;
     } 
-    
+    if (course === null) {
+      this.showMsg("žák z neznámého kurzu","error");
+      return;
+    }    
+
+    if (this.isInActiveList(this.state.activeStudents,student)) {
+      this.showMsg("opakovaný vstup","error");
+      return;
+    }
+
+
+    if (this.isInActiveList(this.state.activeCourses,course)) {
+      this.setState({activeStudents:[...this.state.activeStudents,student]});
+      this.showMsg("vstup ok","ok");
+      return;
+    }
+
+    if ((student.sex === "m") && (this.isInActiveList(this.state.activeHostMCourses,course))) {
+      this.setState({activeStudents:[...this.state.activeStudents,student]});
+      this.showMsg("host ok","ok");
+      return;
+    }
+
+    if ((student.sex === "f") && (this.isInActiveList(this.state.activeHostFCourses,course))) {
+      this.setState({activeStudents:[...this.state.activeStudents,student]});
+      this.showMsg("host ok","ok");
+      return;
+    }
+
+    this.showMsg("vstup zamitnut","error");
+
+
   }
 
-  isCourseInActive(list,course) {
+  isInActiveList(list,course) {
     const fc = list.find((c)=>{
       return (c._id === course._id);
     })
@@ -202,18 +239,18 @@ class App extends React.Component {
     console.log(cmd.id);
     switch(cmd.id) {
       case "C_SETUP":
-        this.setState({activeCourses:[course]});
+        this.setState({activeCourses:[course], activeStudents:[]});
         this.showMsg("nastaven kurz","setup");
       break;
       case "C_SETUP_GM":
         getCourses(course.season_key, course.folder_key, (list)=>{
           console.log("MHost list:",list);
-          this.setState({activeCourses:[course], activeHostMCourses:list});
+          this.setState({activeCourses:[course], activeHostMCourses:list, activeStudents:[]});
           this.showMsg("nastaven kurz + hostování","setup");
         });
       break;
       case "C_ADD":
-        if (this.isCourseInActive(this.state.activeCourses,course)) {
+        if (this.isInActiveList(this.state.activeCourses,course)) {
           this.showMsg("kurz je již vybrán","error"); 
         } else {
           this.setState({activeCourses:[...this.state.activeCourses,course]});
@@ -221,7 +258,7 @@ class App extends React.Component {
         }
       break;
       case "C_ADD_M":
-        if (this.isCourseInActive(this.state.activeHostMCourses,course)) {
+        if (this.isInActiveList(this.state.activeHostMCourses,course)) {
           this.showMsg("kurz je již vybrán","error"); 
         } else {
           this.setState({activeHostMCourses:[...this.state.activeHostMCourses,course]});
@@ -229,7 +266,7 @@ class App extends React.Component {
         }
       break;
       case "C_ADD_F":
-        if (this.isCourseInActive(this.state.activeHostFCourses,course)) {
+        if (this.isInActiveList(this.state.activeHostFCourses,course)) {
           this.showMsg("kurz je již vybrán","error"); 
         } else {
           this.setState({activeHostFCourses:[...this.state.activeHostFCourses,course]});
@@ -271,6 +308,7 @@ class App extends React.Component {
               <Button raised color="primary" onClick={(e)=>this.onSyncButton(e)}>Sync</Button>
               <Button raised color="primary" onClick={(e)=>this.onCfgButton(e)}>Cfg</Button>
               <Button raised color="primary" onClick={(e)=>this.onCoursesButton(e)}>Courses</Button>
+              <Button raised color="primary" onClick={(e)=>this.onResetButton(e)}>Reset</Button>
               <Button raised color="primary" onClick={(e)=>this.onTestSetupButton(e)}>TestSetup</Button>
               <Button raised color="primary" onClick={(e)=>this.onFullScreenButton(e)}>FullScreen</Button>
               <Button raised color="primary" onClick={(e)=>this.onDevToolButton(e)}>DevTool</Button>
@@ -289,7 +327,7 @@ class App extends React.Component {
           <Grid item xs={8}>
             <Paper className={classes.gridPaper}>
               <Typography type="display3" align="center">
-                <HallInfo male={1} female={5}/>
+                <HallInfo students={this.state.activeStudents}/>
               </Typography>
             </Paper>
           </Grid>
@@ -320,7 +358,7 @@ class App extends React.Component {
             <Paper  className={classes.gridPaper}>
               <ScanLine 
                 active={!(this.state.cfgOpen || this.state.coursesOpen)}
-                onScanStudent = {(card,st,rd)=>this.onScanStudent(card,st,rd)}
+                onScanStudent = {(card,st,cs,rd)=>this.onScanStudent(card,st,cs,rd)}
                 onScanCmd = {(cmd,c,rd)=>this.onScanCmd(cmd,c,rd)}
                 onScanError = {(msg,rd)=>this.onScanError(msg,rd)}
               />

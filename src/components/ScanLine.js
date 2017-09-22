@@ -17,6 +17,9 @@ const fakeCard4 = "TS_CMD*eJyrVipLLVKyUgoJNlTSUcpMATKd44NdQ0ID4t19gSLJ+aVFxanxYI
 const fakeCard5 = "TS_CMD*eJyrVipLLVKyUgoJNlTSUcpMATKd4x1dXICc5PzSouLUeLBYYnpBVVpeUJVPREFGsntOVXKGr49repRLknFYZbJRaGS6p7OjUUCqS2Z6vi9Ca3J+SipQsyFCJC8xFyRSFVNqYJBqmJ2TmJIHZqYoFJcAGYamlqkp+SCGmWF2fk5xNljSUqEkMS8VJGoAU65UCwCFODwe*2616170447**";
 const fakeCard6 = "TS_CMD*eJyrVipLLVKyUgoJNlTSUcpMATKd4x1dXOJ9gdzk/NKi4tR4sGhiekFVWl5QlU9EQUaye05Vcoavj2t6lEuScVhlslFoZLqns6NRQKpLZno+ktbk/JRUoGZDhEheYi5IpCqm1MAg1TA7JzElD8xMUSguATIMTS1TU/JBDDPD7Pyc4mywpKVCSWJeKkjUAKZcqRYA/z08yg==*377203085**";
 const fakeCard7 = "TS_CMD*eJyrVipLLVKyUgoJNlTSUcpMATKd4x1dXOLdgNzk/NKi4tR4sGhiekFVWl5QlU9EQUaye05Vcoavj2t6lEuScVhlslFoZLqns6NRQKpLZnq+L0Jrcn5KKlCzIUIkLzEXJFIVU2pgkGqYnZOYkgdmpigUlwAZhqaWqSn5IIaZYXZ+TnE2WNJSoSQxLxUkagBTrlQLAPrPPMM=*4290452104**";
+const fakeCard8 = "TS*71581*eJyrVipLLVKyUgoJNlTSUcpMUbIyNzS1MNRRKk5NLM7PA8oYGRia6xtaAGWT80uLilOBQiCleYm5IGZIfm5MqYFBqiGQNDQDSRSXFkHlnEqzyxJzUkBiqRVAfq5SLQCgwh9i*511121617*89993390**";
+const fakeCard9 = "TS*72210*eJyrVipLLVKyUgoJNlTSUcpMUbIyNzIyNNBRKk5NLM7PA8oYGRia6xtaAGWT80uLilOBQiCleYm5IKZXaU5mKpBbXFoEFQmLKTUwSE0pyc4vA7NAiotTK4AyaUq1ALKwH8w=*1471044403*2247658100**";
+
 
 class ScanLine extends Component {
     constructor(props) {
@@ -69,14 +72,27 @@ class ScanLine extends Component {
 
     processValue(data) {
         console.log("processing input data",data)
-        const dc = decode_card(data);
+        let dc = null;
+        if (data.match(/^[0-9]+$/)) {
+            console.log("DIRECT INPUT");
+            dc = { action: "TS", id: Number(data)};
+        } else {
+            dc = decode_card(data);
+        }
+
         if (dc === null) {
             this.props.onScanError("nelze přečíst kartu",data)
         } else { 
             switch(dc.action) {
                 case 'TS':
                     findRefGid(dc.id, (st)=>{
-                        this.props.onScanStudent(dc,st,data);
+                        if (st === null) {
+                            this.props.onScanStudent(dc,null,null,data);
+                        } else {
+                            getCourse(st.course_key,(course)=>{
+                                this.props.onScanStudent(dc,st,course,data);
+                            })       
+                        }
                     });
                 break;
                 case 'TS_CMD':
@@ -107,7 +123,7 @@ class ScanLine extends Component {
                 />, 
                 active: {this.props.active?"yes":"no"} typing: {this.state.typing? "yes":"no"} focus: {this.state.focused? "yes":"no"}
                 <br/>
-                <Button onClick={(e)=>this.onFakeCard(e,fakeCard1)}>TSCard_st</Button>
+                <Button onClick={(e)=>this.onFakeCard(e,fakeCard8)}>TSCard_st</Button>
                 <Button onClick={(e)=>this.onFakeCard(e,fakeCard7)}>TSCard_cmd</Button>
             </div>
         )

@@ -8,6 +8,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Button from 'material-ui/Button';
+import Tooltip from 'material-ui/Tooltip';
+import CfgIcon from 'material-ui-icons/Settings';
+import DevIcon from 'material-ui-icons/Build';
+import InputIcon from 'material-ui-icons/Input';
+import QuitIcon from 'material-ui-icons/PowerSettingsNew';
+import DeleteIcon from 'material-ui-icons/DeleteForever';
+import FullScreenIcon from 'material-ui-icons/SettingsOverscan';
+import TestIcon from 'material-ui-icons/TouchApp';
+import CloudIcon from 'material-ui-icons/CloudDownload';
 import Paper from 'material-ui/Paper';
 import Grid from 'material-ui/Grid';
 import FontAwesome from 'react-fontawesome';
@@ -26,7 +35,7 @@ import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 import {startSync,stopSync,findRefGid,getCoursesTree,registerDBCallback,getSyncState,getCourse, getCourses} from '../utils/Db';
 import ECom from '../utils/ECom';
 
-
+import Cfg from '../utils/Cfg';
 
 const muitheme = createMuiTheme({
   palette: {
@@ -57,7 +66,10 @@ const styles  = theme => ({
       height: '2px',
       margin: '0px',
       paggind: '0px'
-    }
+    },
+    button: {
+      margin: theme.spacing.unit,
+    },
 });
 
 const heightSub = 300;
@@ -85,6 +97,7 @@ class App extends React.Component {
       winHeight: 500,
       winWidth: 500,
     };
+    this.cfg = new Cfg();
     this.updateDimensions = this.updateDimensions.bind(this);
     this.hideTimeout = null;
     this.flashTimeout = null;
@@ -112,6 +125,11 @@ class App extends React.Component {
   onFullScreenButton(e) {
     console.log("fullscreen button!");
     ECom.toggleFullScreen();
+  }
+
+  onQuitButton(e) {
+    console.log("quit button!");
+    ECom.appQuit();
   }
 
   onDevToolButton(e) {
@@ -146,6 +164,18 @@ class App extends React.Component {
       console.log("list ready",list)
       this.setState({coursesList:list})
     })
+    if (this.cfg.full_screen) {
+      console.log("set fullscreen")
+      ECom.setFullScreen();
+    } else {
+      console.log("clear fullscreen")
+    }
+
+    if (this.cfg.startup_sync) {
+      console.log("auto startup sync")
+      startSync();
+    }
+
   }
   componentWillUnmount() {
     window.removeEventListener("resize", this.updateDimensions);
@@ -218,7 +248,7 @@ class App extends React.Component {
       return;
     }
 
-    this.showMsg("vstup zamitnut","error");
+    this.showMsg("vstup zamítnut","error");
 
 
   }
@@ -254,7 +284,7 @@ class App extends React.Component {
           this.showMsg("kurz je již vybrán","error"); 
         } else {
           this.setState({activeCourses:[...this.state.activeCourses,course]});
-          this.showMsg("pridan kurz","setup");
+          this.showMsg("přidán kurz","setup");
         }
       break;
       case "C_ADD_M":
@@ -262,7 +292,7 @@ class App extends React.Component {
           this.showMsg("kurz je již vybrán","error"); 
         } else {
           this.setState({activeHostMCourses:[...this.state.activeHostMCourses,course]});
-          this.showMsg("pridan kurz","setup");
+          this.showMsg("přidán kurz","setup");
         }
       break;
       case "C_ADD_F":
@@ -270,7 +300,7 @@ class App extends React.Component {
           this.showMsg("kurz je již vybrán","error"); 
         } else {
           this.setState({activeHostFCourses:[...this.state.activeHostFCourses,course]});
-          this.showMsg("pridan kurz","setup");
+          this.showMsg("přidán kurz","setup");
         }
       break;
       default:
@@ -294,7 +324,7 @@ class App extends React.Component {
             </Paper>
           </Grid>
           <Grid item xs={8}>
-            <Paper className={classes.gridPaper}>
+            <div>
               <CfgDialog open={this.state.cfgOpen} onRequestClose={(e)=>this.setState({cfgOpen:false})}/>
               <CoursesDialog 
                 open={this.state.coursesOpen} 
@@ -305,14 +335,29 @@ class App extends React.Component {
                 activeHostFCourses = {this.state.activeHostFCourses}
                 onSave={(courses,mhosts,fhosts)=>this.handleActiveCoursesList(courses,mhosts,fhosts)}
               />   
-              <Button raised color="primary" onClick={(e)=>this.onSyncButton(e)}>Sync</Button>
-              <Button raised color="primary" onClick={(e)=>this.onCfgButton(e)}>Cfg</Button>
-              <Button raised color="primary" onClick={(e)=>this.onCoursesButton(e)}>Courses</Button>
-              <Button raised color="primary" onClick={(e)=>this.onResetButton(e)}>Reset</Button>
-              <Button raised color="primary" onClick={(e)=>this.onTestSetupButton(e)}>TestSetup</Button>
-              <Button raised color="primary" onClick={(e)=>this.onFullScreenButton(e)}>FullScreen</Button>
-              <Button raised color="primary" onClick={(e)=>this.onDevToolButton(e)}>DevTool</Button>
-              </Paper>
+              <Grid container className={classes.gridContainer} justify={"space-around"} >
+                <Tooltip title="Aktualizace DB">
+                  <Button raised className={classes.button} color="primary" disabled={this.state.activeSync} onClick={(e)=>this.onSyncButton(e)}><CloudIcon/></Button>  
+                </Tooltip>
+                <Tooltip title="Konfigurace">
+                  <Button raised className={classes.button} color="primary" onClick={(e)=>this.onCfgButton(e)}><CfgIcon/></Button>
+                </Tooltip>
+                <Tooltip title="Nastavení vstupu">
+                  <Button raised className={classes.button} color="primary" onClick={(e)=>this.onCoursesButton(e)}><InputIcon/></Button>
+                </Tooltip>
+                <Tooltip title="Vynulování počítadla">
+                  <Button raised className={classes.button} color="primary" onClick={(e)=>this.onResetButton(e)}><DeleteIcon/></Button>
+                </Tooltip>
+                { this.cfg.debug && <Button raised className={classes.button} color="primary" onClick={(e)=>this.onTestSetupButton(e)}><TestIcon/></Button> }
+                <Tooltip title="Celo-obrazovkový mód">
+                  <Button raised className={classes.button} color="primary" onClick={(e)=>this.onFullScreenButton(e)}><FullScreenIcon/></Button>
+                </Tooltip>  
+                { this.cfg.debug && <Button raised className={classes.button} color="primary" onClick={(e)=>this.onDevToolButton(e)}><DevIcon/></Button> }
+                <Tooltip title="Vypnutí">
+                  <Button raised className={classes.button} color="primary" onClick={(e)=>this.onQuitButton(e)}><QuitIcon/></Button>
+                </Tooltip>
+              </Grid>
+            </div>
           </Grid>
           <Grid item xs={12}>
             <div className={classes.gridSeparator}/>

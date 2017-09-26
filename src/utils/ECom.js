@@ -22,6 +22,13 @@ function appQuit() {
 function toggleFullScreen() {
     rrsend({action:"togglefs"});
 }
+function setFullScreen() {
+    rrsend({action:"setfs"});
+}
+function clearFullScreen() {
+    rrsend({action:"clearfs"});
+}
+
 function openDevTools() {
     rrsend({action:"devtools"});
 }
@@ -30,5 +37,7 @@ function openDevTools() {
 module.exports = {
   appQuit: appQuit,
   toggleFullScreen:toggleFullScreen,
+  setFullScreen: setFullScreen,
+  clearFullScreen: clearFullScreen,
   openDevTools: openDevTools
 };

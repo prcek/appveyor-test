@@ -12,6 +12,10 @@ import Typography from 'material-ui/Typography';
 import CloseIcon from 'material-ui-icons/Close';
 import Slide from 'material-ui/transitions/Slide';
 import TextField from 'material-ui/TextField';
+import Checkbox from 'material-ui/Checkbox';
+import { FormControlLabel } from 'material-ui/Form';
+import Switch from 'material-ui/Switch';
+
 import { withStyles } from 'material-ui/styles';
 
 import Cfg from '../utils/Cfg';
@@ -42,12 +46,18 @@ class CfgDialog extends Component {
     constructor(props) {
         super(props);
         this.cfg = new Cfg();
-        this.state = { remote_api_url: "", remote_api_secret: ""};
+        this.state = { remote_api_url: "", remote_api_secret: "",full_screen:false, startup_sync:false, debug:false};
     }
 
     handleDialogEnter() {
         //console.log("handleDialogEnter");
-        this.setState({remote_api_url: this.cfg.remote_api_url, remote_api_secret: this.cfg.remote_api_secret});
+        this.setState({
+            remote_api_url: this.cfg.remote_api_url, 
+            remote_api_secret: this.cfg.remote_api_secret, 
+            full_screen: this.cfg.full_screen,
+            startup_sync: this.cfg.startup_sync,
+            debug: this.cfg.debug
+        });
     }
     handleDialogExit() {
         //console.log("handleDialogExit");
@@ -56,6 +66,9 @@ class CfgDialog extends Component {
         //console.log("handleSaveAndClose");
         this.cfg.remote_api_secret = this.state.remote_api_secret;
         this.cfg.remote_api_url = this.state.remote_api_url;
+        this.cfg.full_screen = this.state.full_screen;
+        this.cfg.startup_sync = this.state.startup_sync;
+        this.cfg.debug = this.state.debug;
         this.props.onRequestClose(e);
     }
     componentDidMount() {
@@ -103,6 +116,37 @@ class CfgDialog extends Component {
                         onChange={event => this.setState({ remote_api_secret: event.target.value })}
                         margin="normal"
                     />
+
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={this.state.full_screen}
+                                onChange={(event, checked) => this.setState({ full_screen: checked })}
+                            />
+                        }
+                        label="Auto FullScreen"
+                    />
+
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={this.state.startup_sync}
+                                onChange={(event, checked) => this.setState({ startup_sync: checked })}
+                            />
+                        }
+                        label="Auto startup sync"
+                    />
+
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={this.state.debug}
+                                onChange={(event, checked) => this.setState({ debug: checked })}
+                            />
+                        }
+                        label="Debug"
+                    />
+
                 </form>
             </Dialog>
     );

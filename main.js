@@ -89,6 +89,16 @@ ipcMain.on('rr', (event, payload) => {
               mainWindow.setFullScreen(!mainWindow.isFullScreen());
           }
       break;
+      case "setfs":
+        if (mainWindow) {
+          mainWindow.setFullScreen(true);
+        }
+      break;
+      case "clearfs":
+        if (mainWindow) {
+          mainWindow.setFullScreen(false);
+        }
+      break;
       case "devtools": 
           if (mainWindow) {
               mainWindow.webContents.openDevTools()

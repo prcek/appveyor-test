@@ -213,6 +213,11 @@ class App extends React.Component {
     this.restartHideTimeout();
   }
 
+  onScanManual(val) {
+    this.setState({message: val, message_type:"manual",message_flash:false})
+    this.restartHideTimeout();
+  }
+
   onScanStudent(card,student,course,raw_data) {
     console.log("onScanStudent",card,student,course);
     if (student === null) {
@@ -315,13 +320,14 @@ class App extends React.Component {
 
   render() {
     const classes = this.props.classes;
+    const gridContainerClass = this.cfg.debug ? classes.gridContainer: {};
     return (
       <MuiThemeProvider theme={muitheme}>
-        <Grid container className={classes.gridContainer}>
+        <Grid container className={gridContainerClass}>
           <Grid item xs={4}>
-            <Paper className={classes.gridPaper}>
+            <div className={classes.gridPaper}>
               <SyncPanel activeSync={this.state.activeSync} syncOk={this.state.syncOk} apiReady={this.state.apiReady}/>
-            </Paper>
+            </div>
           </Grid>
           <Grid item xs={8}>
             <div>
@@ -335,7 +341,7 @@ class App extends React.Component {
                 activeHostFCourses = {this.state.activeHostFCourses}
                 onSave={(courses,mhosts,fhosts)=>this.handleActiveCoursesList(courses,mhosts,fhosts)}
               />   
-              <Grid container className={classes.gridContainer} justify={"space-around"} >
+              <Grid container className={gridContainerClass} justify={"space-around"} >
                 <Tooltip title="Aktualizace DB">
                   <Button raised className={classes.button} color="primary" disabled={this.state.activeSync} onClick={(e)=>this.onSyncButton(e)}><CloudIcon/></Button>  
                 </Tooltip>
@@ -363,18 +369,14 @@ class App extends React.Component {
             <div className={classes.gridSeparator}/>
           </Grid>
           <Grid item xs={4}>
-            <Paper className={classes.gridPaper}>
               <Typography type="display3" align="center">
                 <Clock />
               </Typography>
-            </Paper>
           </Grid>
           <Grid item xs={8}>
-            <Paper className={classes.gridPaper}>
               <Typography type="display3" align="center">
                 <HallInfo students={this.state.activeStudents}/>
               </Typography>
-            </Paper>
           </Grid>
 
           <Grid item xs={12}>
@@ -382,7 +384,7 @@ class App extends React.Component {
           </Grid>
 
           <Grid item xs={4}  >
-            <Paper className={classes.gridPaper} style={{overflow: 'scroll', height: this.state.winHeight-heightSub}}>
+            <div className={classes.gridPaper} style={{overflow: 'scroll', height: this.state.winHeight-heightSub}}>
               { this.state.activeCourses.length==0 && <Typography type="headline" align="center"> Není zvolen kurz pro vstup </Typography>}
               { this.state.activeCourses.length>0 && <Typography type="headline" align="center"> Vstup pro kurz </Typography>}
               <CoursesChips courses={this.state.activeCourses} />
@@ -390,7 +392,7 @@ class App extends React.Component {
               <CoursesChips courses={this.state.activeHostMCourses} />
               { this.state.activeHostFCourses.length>0 && <Typography type="headline" align="center"> Hostování holky </Typography>}
               <CoursesChips courses={this.state.activeHostFCourses} />
-            </Paper>
+            </div>
           </Grid>
           <Grid item xs={8} >
             <Grid container align={'center'} justify={'center'} style={{height: this.state.winHeight-heightSub}}>
@@ -400,14 +402,16 @@ class App extends React.Component {
             </Grid>
           </Grid>
           <Grid item xs={12}>
-            <Paper  className={classes.gridPaper}>
+            <div className={classes.gridPaper}>
               <ScanLine 
+                debug={this.cfg.debug}
                 active={!(this.state.cfgOpen || this.state.coursesOpen)}
                 onScanStudent = {(card,st,cs,rd)=>this.onScanStudent(card,st,cs,rd)}
                 onScanCmd = {(cmd,c,rd)=>this.onScanCmd(cmd,c,rd)}
                 onScanError = {(msg,rd)=>this.onScanError(msg,rd)}
+                onScanManual = {(val)=>this.onScanManual(val)}
               />
-            </Paper>
+            </div>
           </Grid>
         </Grid>
       </MuiThemeProvider>

@@ -44,7 +44,7 @@ module.exports = {
  // target: 'electron-renderer',
   target: 'web',
   plugins: [
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({title: 'My App'}),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development')
     })

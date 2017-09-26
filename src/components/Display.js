@@ -29,10 +29,10 @@ class Display extends Component {
             case "setup": icon_name = "wrench"; icon_color="white"; break;
             case "init":  icon_name = "thumbs-o-up"; icon_color="white"; break;
             case "idle":  icon_name = "search"; icon_color="gray"; break;
+            case "manual": icon_name = "search"; icon_color="blue"; break;
         }
         return (
             <div>
-                { this.props.flash && <p style={{color:"red"}}> active </p>}
                 <Typography type="display4" align="center"> 
                     <FontAwesome name={icon_name} style={{color:icon_color}}/>
                 </Typography>

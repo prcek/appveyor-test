@@ -46,6 +46,14 @@ class ScanLine extends Component {
         if (this.state.typing && ((now - this.state.lastKey) > 2000)) {
             this.setState({typing:false});
         }
+
+    }
+
+    handleValue(val) {
+        this.setState({ value: val })
+        if (val.match(/^[0-9]+/)) {
+            this.props.onScanManual(val);
+        }
     }
 
     handleKeyPress(e) {
@@ -107,8 +115,21 @@ class ScanLine extends Component {
        
     }
 
+    renderDebug() {
+        return (
+            <div>
+                <Typography>
+                    active: {this.props.active?"yes":"no"} typing: {this.state.typing? "yes":"no"} focus: {this.state.focused? "yes":"no"}
+                </Typography>
+                <Button onClick={(e)=>this.onFakeCard(e,fakeCard8)}>TSCard_st</Button>
+                <Button onClick={(e)=>this.onFakeCard(e,fakeCard7)}>TSCard_cmd</Button>
+            </div>
+        )
+    }
 
     render() {
+        const dbg = this.renderDebug();
+        
         return (
             <div>   
                 { this.state.typing && <LinearProgress />}
@@ -116,15 +137,13 @@ class ScanLine extends Component {
                     ref={(input) => { this.inputNode = input; }} 
                     type='text' 
                     value={this.state.value} 
-                    onChange={event => this.setState({ value: event.target.value })}
+                    onChange={event => this.handleValue(event.target.value)}
                     onKeyPress={event=> this.handleKeyPress(event)}
                     onBlur={()=>this.onBlur()}
                     onFocus={()=>this.onFocus()}
+                    style={this.props.debug? {}:{color:"black", background: "black", border: "0px", height:'1px', width:'1px', outline: "none"}}
                 />, 
-                active: {this.props.active?"yes":"no"} typing: {this.state.typing? "yes":"no"} focus: {this.state.focused? "yes":"no"}
-                <br/>
-                <Button onClick={(e)=>this.onFakeCard(e,fakeCard8)}>TSCard_st</Button>
-                <Button onClick={(e)=>this.onFakeCard(e,fakeCard7)}>TSCard_cmd</Button>
+                {this.props.debug && dbg}
             </div>
         )
     };
@@ -133,7 +152,8 @@ ScanLine.propTypes = {
     active: PropTypes.bool.isRequired,
     onScanStudent: PropTypes.func.isRequired,
     onScanCmd: PropTypes.func.isRequired,
-    onScanError: PropTypes.func.isRequired
+    onScanError: PropTypes.func.isRequired,
+    onScanManual: PropTypes.func.isRequired
 };
 
 

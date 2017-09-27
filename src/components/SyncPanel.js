@@ -3,11 +3,12 @@ import Button from 'material-ui/Button';
 import Grid from 'material-ui/Grid';
 import PropTypes from 'prop-types';
 import FontAwesome from 'react-fontawesome';
+import Typography from 'material-ui/Typography';
 
 class SyncPanel extends Component {
     render() {
         return (
-            <span>
+            <Typography>
                 DB Sync:
                 <FontAwesome spin={this.props.activeSync} className="text-danger" name="cog"/>
                 { (this.props.syncOk === false) && 
@@ -19,7 +20,7 @@ class SyncPanel extends Component {
                 { (this.props.syncOk === true) && 
                     <FontAwesome className="text-danger" name="check"/>
                 }
-            </span>
+            </Typography>
         )
     };
 }

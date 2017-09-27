@@ -223,9 +223,9 @@ function startSync(){
     completeUpdate().then(r=>{
         syncIsRunning = false;
         syncIsOk = true;
+        cfg.last_sync = new Date();
         reportState();
     }).catch(e=>{
-
         console.log("ERROR");
         syncIsRunning = false;
         syncIsOk = false;
@@ -311,6 +311,18 @@ function getCourses(season_key, folder_key,callback) {
     });
 }
 
+function reportEnter(status,student,course,mode) {
+//TODO
+}
+
+function reportRawScan(status,data) {
+//TODO
+}
+
+function reportSetupCmd(action,course) {
+//TODO
+}
+
 
 module.exports = {
     startSync:startSync,
@@ -321,6 +333,8 @@ module.exports = {
     getCoursesTree: getCoursesTree,
     getCourse: getCourse,
     getCourses: getCourses,
-
+    reportEnter: reportEnter,
+    reportRawScan: reportRawScan,
+    reportSetupCmd: reportSetupCmd
 }
   

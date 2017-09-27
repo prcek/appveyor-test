@@ -38,7 +38,7 @@ class ScanLine extends Component {
     onTick() {
         const now = new Date();
         if (this.props.active && !this.state.focused && ((now - this.state.focusLost) > 5000)) {
-            console.log("focus fix");
+            //console.log("focus fix");
             this.inputNode.focus();
             const len = this.inputNode.value.length;
             this.inputNode.setSelectionRange(len, len);
@@ -141,7 +141,7 @@ class ScanLine extends Component {
                     onKeyPress={event=> this.handleKeyPress(event)}
                     onBlur={()=>this.onBlur()}
                     onFocus={()=>this.onFocus()}
-                    style={this.props.debug? {}:{color:"black", background: "black", border: "0px", height:'1px', width:'1px', outline: "none"}}
+                    style={this.props.debug? {width:'100%'}:{color:"black", background: "black", border: "0px", height:'1px', width:'1px', outline: "none"}}
                 />, 
                 {this.props.debug && dbg}
             </div>

@@ -53,9 +53,13 @@ const styles  = theme => ({
       //height: '95vh'  
     },
     gridContainer: {
-      border: '1px solid red',
     },
     gridItem: {
+    },
+    gridContainerD: {
+      border: '1px solid red',
+    },
+    gridItemD: {
       border: '1px solid blue',
     },
     gridPaper: {
@@ -146,7 +150,7 @@ class App extends React.Component {
 
   onDBChange(e) {
     //console.log("onDBChange",e)
-    this.setState({activeSync:e.active,syncOk:e.ok,apiReady:e.apiReady});
+    this.setState({activeSync:e.active,syncOk:e.ok,apiReady:e.apiReady,lastSync:this.cfg.last_sync});
   } 
 
   handleActiveCoursesList(courses,mhosts,fhosts) {
@@ -174,6 +178,8 @@ class App extends React.Component {
     if (this.cfg.startup_sync) {
       console.log("auto startup sync")
       startSync();
+    } else {
+      this.setState({lastSync:this.cfg.last_sync})
     }
 
   }
@@ -320,13 +326,13 @@ class App extends React.Component {
 
   render() {
     const classes = this.props.classes;
-    const gridContainerClass = this.cfg.debug ? classes.gridContainer: {};
+    const gridContainerClass = this.cfg.debug ? classes.gridContainerD: classes.gridContainer;
     return (
       <MuiThemeProvider theme={muitheme}>
         <Grid container className={gridContainerClass}>
           <Grid item xs={4}>
             <div className={classes.gridPaper}>
-              <SyncPanel activeSync={this.state.activeSync} syncOk={this.state.syncOk} apiReady={this.state.apiReady}/>
+              <SyncPanel activeSync={this.state.activeSync} syncOk={this.state.syncOk} apiReady={this.state.apiReady} lastSync={this.state.lastSync}/>
             </div>
           </Grid>
           <Grid item xs={8}>

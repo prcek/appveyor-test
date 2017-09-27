@@ -54,6 +54,13 @@ class Cfg {
         this.setBool("debug",val);
     }
 
+    get last_sync() {
+        return new Date(this.getItem("last_sync",0));
+    }
+
+    set last_sync(date) {
+        this.setItem("last_sync",date);
+    }
 };
 
 module.exports = Cfg;

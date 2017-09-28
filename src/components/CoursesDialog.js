@@ -259,10 +259,10 @@ class CoursesDialog extends Component {
                         <CloseIcon />
                     </IconButton>
                     <Typography type="title" color="inherit" className={classes.flex}>
-                        Courses
+                        Nastavení vstupu
                     </Typography>
                     <Button color="contrast" onClick={(e)=>{this.handleSaveAndClose(e)}}>
-                        save
+                        Uložit
                     </Button>
                     </Toolbar>
                 </AppBar>

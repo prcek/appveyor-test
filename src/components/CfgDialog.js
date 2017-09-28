@@ -94,10 +94,10 @@ class CfgDialog extends Component {
                         <CloseIcon />
                     </IconButton>
                     <Typography type="title" color="inherit" className={classes.flex}>
-                        Configuration
+                        Konfigurace
                     </Typography>
                     <Button color="contrast" onClick={(e)=>{this.handleSaveAndClose(e)}}>
-                        save
+                        Uložit
                     </Button>
                     </Toolbar>
                 </AppBar>
@@ -121,7 +121,7 @@ class CfgDialog extends Component {
 
                     <TextField
                         id="station_name"
-                        label="Station Name"
+                        label="Název stanice"
                         className={classes.textField}
                         value={this.state.station_name}
                         onChange={event => this.setState({ station_name: event.target.value })}
@@ -135,7 +135,7 @@ class CfgDialog extends Component {
                                 onChange={(event, checked) => this.setState({ full_screen: checked })}
                             />
                         }
-                        label="Auto FullScreen"
+                        label="Startovat v celo-obrazovkovém módu"
                     />
 
                     <FormControlLabel
@@ -145,7 +145,7 @@ class CfgDialog extends Component {
                                 onChange={(event, checked) => this.setState({ startup_sync: checked })}
                             />
                         }
-                        label="Auto startup sync"
+                        label="Aktualizovat DB po zapnutí"
                     />
 
                     <FormControlLabel

@@ -19,6 +19,13 @@ class Cfg {
         return (this.getItem(key,"off") === "on");
     }
 
+    get station_name() {
+        return this.getItem("station_name","default station");
+    }
+    set station_name(val) {
+        this.setItem("station_name",val);
+    }
+
     get remote_api_url() {
         return this.getItem("remote_api_url","http://localhost:3000/remote_api");
     }

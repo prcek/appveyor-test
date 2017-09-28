@@ -32,7 +32,7 @@ import ScanLine from './ScanLine';
 
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 
-import {startSync,stopSync,findRefGid,getCoursesTree,registerDBCallback,getSyncState,getCourse, getCourses} from '../utils/Db';
+import {startSync,stopSync,findRefGid,getCoursesTree,registerDBCallback,getSyncState,getCourse, getCourses, reportEnter} from '../utils/Db';
 import ECom from '../utils/ECom';
 
 import Cfg from '../utils/Cfg';
@@ -87,7 +87,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = { 
-      message: "hi!", 
+      message: "verze 1.1", 
       message_type: "init",
       activeSync: false, 
       syncOk:null, 
@@ -141,10 +141,12 @@ class App extends React.Component {
     ECom.openDevTools();
   }
 
-  onTestSetupButton(e) {
+  onTestButton(e) {
     console.log("test setup button!");
-    getCourse("agpzfnRzLXphcGlzchMLEgZDb3Vyc2UYgICA2IL3kAoM",c=>{
-      this.setState({activeCourses:[c]});
+    getCourse("agpzfnRzLXphcGlzchMLEgZDb3Vyc2UYgICA2PeDigoM",c=>{
+      findRefGid(71581,(s)=>{
+        reportEnter("ok",s,c,"participant")
+      })
     })
   }
 
@@ -181,7 +183,7 @@ class App extends React.Component {
     } else {
       this.setState({lastSync:this.cfg.last_sync})
     }
-
+    this.restartHideTimeout();
   }
   componentWillUnmount() {
     window.removeEventListener("resize", this.updateDimensions);
@@ -360,7 +362,7 @@ class App extends React.Component {
                 <Tooltip title="Vynulování počítadla">
                   <Button raised className={classes.button} color="primary" onClick={(e)=>this.onResetButton(e)}><DeleteIcon/></Button>
                 </Tooltip>
-                { this.cfg.debug && <Button raised className={classes.button} color="primary" onClick={(e)=>this.onTestSetupButton(e)}><TestIcon/></Button> }
+                { this.cfg.debug && <Button raised className={classes.button} color="primary" onClick={(e)=>this.onTestButton(e)}><TestIcon/></Button> }
                 <Tooltip title="Celo-obrazovkový mód">
                   <Button raised className={classes.button} color="primary" onClick={(e)=>this.onFullScreenButton(e)}><FullScreenIcon/></Button>
                 </Tooltip>  

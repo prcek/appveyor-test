@@ -25,6 +25,7 @@ var seasons_db = new Datastore({ filename: 'seasons.db', autoload: true });
 var folders_db = new Datastore({ filename: 'folders.db', autoload: true });
 var courses_db = new Datastore({ filename: 'courses.db', autoload: true });
 var students_db = new Datastore({ filename: 'students.db', autoload: true });
+var activity_db = new Datastore({ filename: 'activity.db', autoload: true });
 
 var stateCallBack = null;
 var syncIsRunning = false;
@@ -201,7 +202,7 @@ function updateCoursesAndDeleteOld() {
 
 function completeUpdate() {
     return new Promise(function(resolve,reject){
-        pSeries([updateSeasons,updateFolders,updateCoursesAndDeleteOld,updateAllStudentsAndDeleteOld]).then(r=>{
+        pSeries([updateSeasons,updateFolders,updateCoursesAndDeleteOld,updateAllStudentsAndDeleteOld,flushActivityLog]).then(r=>{
             resolve(true);
         }).catch(reject);
     }); 
@@ -311,16 +312,96 @@ function getCourses(season_key, folder_key,callback) {
     });
 }
 
+const uuidV4 = require('uuid/v4');
+function newID() {
+  return uuidV4();
+}
+
+function sendActivity(doc) {
+    return new Promise(function(resolve,reject){
+        remote_api.post('/activity',doc).then(res=>{
+            if (res.status === 200) {
+                activity_db.remove({_id: res.data.id},{},function (err, numRemoved){
+                    if (err) {
+                        console.log(err);
+                        reject(err);
+                    } else {
+                        resolve(true)
+                    }
+                });                        
+            } else {
+                reject(res.status)
+            }
+        }).catch(reject);
+    });
+}
+
+const sendActivityThrottled = pThrottle(sendActivity, 1, 1000);
+
+function logActivity(rep) {
+    activity_db.insert(rep,(err, newDoc)=>{
+        if (err) {
+            console.error(err);
+        } else {
+           // console.log(newDoc);
+            if (apiIsReady) {
+                sendActivity(newDoc).then((ok)=>{
+                    //console.log("activity reported");
+                }).catch(console.error);
+            }
+        }
+    });
+}
+
+function flushActivityLog() {
+    console.log("flushActivityLog");
+    return new Promise(function(resolve,reject){
+        activity_db.find({},function(err,docs){
+            pMap(docs,sendActivityThrottled,{concurency:1}).then(r=>{
+                console.log("flushActivityLog done");
+                resolve(r);
+            }).catch(reject);
+        });
+    });
+       
+}
+
 function reportEnter(status,student,course,mode) {
-//TODO
+    const rep = {
+        _id: newID(),
+        timestamp: new Date(),
+        station: cfg.station_name,
+        type: "enter",
+        status: status,
+        student_id: student._id,
+        course_id: course._id,
+        mode: mode,
+    };
+    logActivity(rep);
 }
 
 function reportRawScan(status,data) {
-//TODO
+    const rep = {
+        _id: newID(),
+        timestamp: new Date(),
+        station: cfg.station_name,
+        type: "raw_scan",
+        status: status,
+        data: data,
+    };
+    logActivity(rep);
 }
 
 function reportSetupCmd(action,course) {
-//TODO
+    const rep = {
+        _id: newID(),
+        timestamp: new Date(),
+        station: cfg.station_name,
+        type: "setup_cmd",
+        action: action,
+        course_id: course._id,
+    };
+    logActivity(rep);
 }
 
 

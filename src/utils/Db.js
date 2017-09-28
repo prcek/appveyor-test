@@ -322,7 +322,7 @@ function newID() {
 function sendActivity(doc) {
     return new Promise(function(resolve,reject){
         remote_api.post('/activity',doc).then(res=>{
-            if (res.status === 200) {
+            if ((res.status === 200) && (res.data.ok)) {
                 activity_db.remove({_id: res.data.id},{},function (err, numRemoved){
                     if (err) {
                         console.log(err);
@@ -332,6 +332,7 @@ function sendActivity(doc) {
                     }
                 });                        
             } else {
+                console.log("can't send activity log")
                 reject(res.status)
             }
         }).catch(reject);

@@ -6,7 +6,7 @@ import Typography from 'material-ui/Typography';
 import FontAwesome from 'react-fontawesome';
 import { LinearProgress } from 'material-ui/Progress';
 import decode_card from '../utils/Decode';
-import {findRefGid,getCourse} from '../utils/Db';
+import {findRefGid,getCourse, reportRawScan} from '../utils/Db';
 
 
 
@@ -84,12 +84,17 @@ class ScanLine extends Component {
         if (data.match(/^[0-9]+$/)) {
             console.log("DIRECT INPUT");
             dc = { action: "TS", id: Number(data)};
+            reportRawScan("manual",data);
         } else {
             dc = decode_card(data);
+            if (dc !== null) {
+                reportRawScan("decode_ok",data);  
+            }
         }
 
         if (dc === null) {
             this.props.onScanError("nelze přečíst kartu",data)
+            reportRawScan("decode_error",data);
         } else { 
             switch(dc.action) {
                 case 'TS':

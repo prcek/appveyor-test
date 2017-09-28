@@ -32,7 +32,7 @@ import ScanLine from './ScanLine';
 
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 
-import {startSync,stopSync,findRefGid,getCoursesTree,registerDBCallback,getSyncState,getCourse, getCourses, reportEnter} from '../utils/Db';
+import {startSync,stopSync,findRefGid,getCoursesTree,registerDBCallback,getSyncState,getCourse, getCourses, reportEnter, reportRawScan, reportSetupCmd, reportInfoLog} from '../utils/Db';
 import ECom from '../utils/ECom';
 
 import Cfg from '../utils/Cfg';
@@ -161,6 +161,7 @@ class App extends React.Component {
   }
  
   componentDidMount() {
+    reportInfoLog("info","startup");
     this.updateDimensions();
     window.addEventListener("resize", this.updateDimensions);
 
@@ -230,15 +231,18 @@ class App extends React.Component {
     console.log("onScanStudent",card,student,course);
     if (student === null) {
       this.showMsg("neznámý žák","error");
+      reportInfoLog("error","missing student");
       return;
     } 
     if (course === null) {
       this.showMsg("žák z neznámého kurzu","error");
+      reportInfoLog("error","missing course");
       return;
     }    
 
     if (this.isInActiveList(this.state.activeStudents,student)) {
       this.showMsg("opakovaný vstup","error");
+      reportEnter("duplicate",student,course,"");
       return;
     }
 
@@ -246,22 +250,26 @@ class App extends React.Component {
     if (this.isInActiveList(this.state.activeCourses,course)) {
       this.setState({activeStudents:[...this.state.activeStudents,student]});
       this.showMsg("vstup ok","ok");
+      reportEnter("ok",student,course,"participant");
       return;
     }
 
     if ((student.sex === "m") && (this.isInActiveList(this.state.activeHostMCourses,course))) {
       this.setState({activeStudents:[...this.state.activeStudents,student]});
       this.showMsg("host ok","ok");
+      reportEnter("ok",student,course,"guest");
       return;
     }
 
     if ((student.sex === "f") && (this.isInActiveList(this.state.activeHostFCourses,course))) {
       this.setState({activeStudents:[...this.state.activeStudents,student]});
       this.showMsg("host ok","ok");
+      reportEnter("ok",student,course,"guest");
       return;
     }
 
     this.showMsg("vstup zamítnut","error");
+    reportEnter("denied",student,course,"");
 
 
   }
@@ -284,12 +292,14 @@ class App extends React.Component {
       case "C_SETUP":
         this.setState({activeCourses:[course], activeStudents:[]});
         this.showMsg("nastaven kurz","setup");
+        reportSetupCmd(cmd.id,course);
       break;
       case "C_SETUP_GM":
         getCourses(course.season_key, course.folder_key, (list)=>{
           console.log("MHost list:",list);
           this.setState({activeCourses:[course], activeHostMCourses:list, activeStudents:[]});
           this.showMsg("nastaven kurz + hostování","setup");
+          reportSetupCmd(cmd.id,course);
         });
       break;
       case "C_ADD":
@@ -298,6 +308,7 @@ class App extends React.Component {
         } else {
           this.setState({activeCourses:[...this.state.activeCourses,course]});
           this.showMsg("přidán kurz","setup");
+          reportSetupCmd(cmd.id,course);
         }
       break;
       case "C_ADD_M":
@@ -306,6 +317,7 @@ class App extends React.Component {
         } else {
           this.setState({activeHostMCourses:[...this.state.activeHostMCourses,course]});
           this.showMsg("přidán kurz","setup");
+          reportSetupCmd(cmd.id,course);
         }
       break;
       case "C_ADD_F":
@@ -314,10 +326,12 @@ class App extends React.Component {
         } else {
           this.setState({activeHostFCourses:[...this.state.activeHostFCourses,course]});
           this.showMsg("přidán kurz","setup");
+          reportSetupCmd(cmd.id,course);
         }
       break;
       default:
         this.showMsg("neznámá ovládací karta","error"); 
+        reportInfoLog("error","unexpected cmd card");
     }
   }
   onScanError(msg,raw_data) {

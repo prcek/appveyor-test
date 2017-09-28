@@ -226,11 +226,13 @@ function startSync(){
         syncIsOk = true;
         cfg.last_sync = new Date();
         reportState();
+        reportInfoLog("info","sync ok");
     }).catch(e=>{
         console.log("ERROR");
         syncIsRunning = false;
         syncIsOk = false;
         reportState();
+        reportInfoLog("info","sync failed");
     });    
 }
 function stopSync(){
@@ -280,7 +282,7 @@ function getSyncState() {
 
 function startMonitor() {
     setInterval(()=>{
-        remote_api.get("/ping").then(res=>{
+        remote_api.post("/ping",{station_name: cfg.station_name}).then(res=>{
             apiIsReady = true;
             reportState();
         }).catch(err=>{
@@ -404,6 +406,18 @@ function reportSetupCmd(action,course) {
     logActivity(rep);
 }
 
+function reportInfoLog(status,data) {
+    const rep = {
+        _id: newID(),
+        timestamp: new Date(),
+        station: cfg.station_name,
+        type: "info",
+        status: status,
+        data:data
+    };
+    logActivity(rep);
+}
+
 
 module.exports = {
     startSync:startSync,
@@ -416,6 +430,7 @@ module.exports = {
     getCourses: getCourses,
     reportEnter: reportEnter,
     reportRawScan: reportRawScan,
-    reportSetupCmd: reportSetupCmd
+    reportSetupCmd: reportSetupCmd,
+    reportInfoLog: reportInfoLog
 }
   

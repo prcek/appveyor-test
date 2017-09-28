@@ -372,7 +372,7 @@ function flushActivityLog() {
 function reportEnter(status,student,course,mode) {
     const rep = {
         _id: newID(),
-        timestamp: new Date(),
+        date: new Date(),
         station: cfg.station_name,
         type: "enter",
         status: status,
@@ -386,7 +386,7 @@ function reportEnter(status,student,course,mode) {
 function reportRawScan(status,data) {
     const rep = {
         _id: newID(),
-        timestamp: new Date(),
+        date: new Date(),
         station: cfg.station_name,
         type: "raw_scan",
         status: status,
@@ -398,7 +398,7 @@ function reportRawScan(status,data) {
 function reportSetupCmd(action,course) {
     const rep = {
         _id: newID(),
-        timestamp: new Date(),
+        date: new Date(),
         station: cfg.station_name,
         type: "setup_cmd",
         action: action,
@@ -410,7 +410,7 @@ function reportSetupCmd(action,course) {
 function reportInfoLog(status,data) {
     const rep = {
         _id: newID(),
-        timestamp: new Date(),
+        date: new Date(),
         station: cfg.station_name,
         type: "info",
         status: status,

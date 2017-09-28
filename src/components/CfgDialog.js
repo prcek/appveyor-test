@@ -46,7 +46,7 @@ class CfgDialog extends Component {
     constructor(props) {
         super(props);
         this.cfg = new Cfg();
-        this.state = { remote_api_url: "", remote_api_secret: "",full_screen:false, startup_sync:false, debug:false};
+        this.state = { remote_api_url: "", remote_api_secret: "",station_name:"",full_screen:false, startup_sync:false, debug:false};
     }
 
     handleDialogEnter() {
@@ -56,6 +56,7 @@ class CfgDialog extends Component {
             remote_api_secret: this.cfg.remote_api_secret, 
             full_screen: this.cfg.full_screen,
             startup_sync: this.cfg.startup_sync,
+            station_name: this.cfg.station_name,
             debug: this.cfg.debug
         });
     }
@@ -66,6 +67,7 @@ class CfgDialog extends Component {
         //console.log("handleSaveAndClose");
         this.cfg.remote_api_secret = this.state.remote_api_secret;
         this.cfg.remote_api_url = this.state.remote_api_url;
+        this.cfg.station_name = this.state.station_name;
         this.cfg.full_screen = this.state.full_screen;
         this.cfg.startup_sync = this.state.startup_sync;
         this.cfg.debug = this.state.debug;
@@ -114,6 +116,15 @@ class CfgDialog extends Component {
                         className={classes.textField}
                         value={this.state.remote_api_secret}
                         onChange={event => this.setState({ remote_api_secret: event.target.value })}
+                        margin="normal"
+                    />
+
+                    <TextField
+                        id="station_name"
+                        label="Station Name"
+                        className={classes.textField}
+                        value={this.state.station_name}
+                        onChange={event => this.setState({ station_name: event.target.value })}
                         margin="normal"
                     />
 

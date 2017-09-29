@@ -87,7 +87,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = { 
-      message: "verze 1.1", 
+      message: "ready", 
+      message_desc: "verze 1.1", 
       message_type: "init",
       activeSync: false, 
       syncOk:null, 
@@ -202,7 +203,7 @@ class App extends React.Component {
     }
     this.hideTimeout = setTimeout(()=>{
       this.hideTimeout = null;
-      this.setState({message:"",message_type:"idle"})
+      this.setState({message:"", message_desc:"",message_type:"idle"})
     },3000)
   }
   restartFlashTimeout() {
@@ -212,36 +213,42 @@ class App extends React.Component {
     this.flashTimeout = setTimeout(()=>{
       this.flashTimeout = null;
       this.setState({message_flash:false})
-    },100)
+    },200)
   }
 
 
-  showMsg(msg,type) {
-    this.setState({message: msg, message_type:type,message_flash:true})
+  showMsg(msg,desc,type) {
+    if ((msg == null) || (msg == undefined)) {
+      msg = "";
+    }
+    if ((desc == null) || (desc == undefined)) {
+      desc = "";
+    }
+    this.setState({message: msg, message_desc: desc, message_type:type,message_flash:true})
     this.restartFlashTimeout();
     this.restartHideTimeout();
   }
 
   onScanManual(val) {
-    this.setState({message: val, message_type:"manual",message_flash:false})
+    this.setState({message: val, message_desc:"ruční zadání čísla karty", message_type:"manual",message_flash:false})
     this.restartHideTimeout();
   }
 
   onScanStudent(card,student,course,raw_data) {
     console.log("onScanStudent",card,student,course);
     if (student === null) {
-      this.showMsg("neznámý žák","error");
+      this.showMsg("","neznámý žák","error");
       reportInfoLog("error","missing student");
       return;
     } 
     if (course === null) {
-      this.showMsg("žák z neznámého kurzu","error");
+      this.showMsg(student.name,"žák z neznámého kurzu","error");
       reportInfoLog("error","missing course");
       return;
     }    
 
     if (this.isInActiveList(this.state.activeStudents,student)) {
-      this.showMsg("opakovaný vstup","error");
+      this.showMsg(student.name,"opakovaný vstup","error");
       reportEnter("duplicate",student,course,"");
       return;
     }
@@ -249,26 +256,32 @@ class App extends React.Component {
 
     if (this.isInActiveList(this.state.activeCourses,course)) {
       this.setState({activeStudents:[...this.state.activeStudents,student]});
-      this.showMsg("vstup ok","ok");
+      if (student.sex === "m") {
+        this.showMsg(student.name,"vstup povolen","ok-male");
+      } else if (student.sex === "f") {
+        this.showMsg(student.name,"vstup povolen","ok-female"); 
+      } else {
+        this.showMsg(student.name,"vstup povolen","ok");
+      }
       reportEnter("ok",student,course,"participant");
       return;
     }
 
     if ((student.sex === "m") && (this.isInActiveList(this.state.activeHostMCourses,course))) {
       this.setState({activeStudents:[...this.state.activeStudents,student]});
-      this.showMsg("host ok","ok");
+      this.showMsg(student.name,"hostování povoleno","ok-male");
       reportEnter("ok",student,course,"guest");
       return;
     }
 
     if ((student.sex === "f") && (this.isInActiveList(this.state.activeHostFCourses,course))) {
       this.setState({activeStudents:[...this.state.activeStudents,student]});
-      this.showMsg("host ok","ok");
+      this.showMsg(student.name,"hostování povoleno","ok-female");
       reportEnter("ok",student,course,"guest");
       return;
     }
 
-    this.showMsg("vstup zamítnut","error");
+    this.showMsg(student.name,"vstup zamítnut","error");
     reportEnter("denied",student,course,"");
 
 
@@ -284,65 +297,66 @@ class App extends React.Component {
   onScanCmd(cmd,course,raw_data) {
     console.log("onScanCmd",cmd,course);
     if (course === null) {
-      this.showMsg("neznámý kurz","error");
+      this.showMsg("neznámý kurz","","error");
       return;
     } 
     console.log(cmd.id);
     switch(cmd.id) {
       case "C_SETUP":
         this.setState({activeCourses:[course], activeStudents:[]});
-        this.showMsg("nastaven kurz","setup");
+        this.showMsg("nastaven kurz",course.code,"setup");
         reportSetupCmd(cmd.id,course);
       break;
       case "C_SETUP_GM":
         getCourses(course.season_key, course.folder_key, (list)=>{
           console.log("MHost list:",list);
           this.setState({activeCourses:[course], activeHostMCourses:list, activeStudents:[]});
-          this.showMsg("nastaven kurz + hostování","setup");
+          this.showMsg("nastaven kurz + hostování",course.code,"setup");
           reportSetupCmd(cmd.id,course);
         });
       break;
       case "C_ADD":
         if (this.isInActiveList(this.state.activeCourses,course)) {
-          this.showMsg("kurz je již vybrán","error"); 
+          this.showMsg("kurz je již vybrán",course.code,"error"); 
         } else {
           this.setState({activeCourses:[...this.state.activeCourses,course]});
-          this.showMsg("přidán kurz","setup");
+          this.showMsg("přidán kurz",course.code,"setup");
           reportSetupCmd(cmd.id,course);
         }
       break;
       case "C_ADD_M":
         if (this.isInActiveList(this.state.activeHostMCourses,course)) {
-          this.showMsg("kurz je již vybrán","error"); 
+          this.showMsg("kurz je již vybrán",course.code,"error"); 
         } else {
           this.setState({activeHostMCourses:[...this.state.activeHostMCourses,course]});
-          this.showMsg("přidán kurz","setup");
+          this.showMsg("přidán kurz (hostování)",course.code,"setup");
           reportSetupCmd(cmd.id,course);
         }
       break;
       case "C_ADD_F":
         if (this.isInActiveList(this.state.activeHostFCourses,course)) {
-          this.showMsg("kurz je již vybrán","error"); 
+          this.showMsg("kurz je již vybrán",course.code,"error"); 
         } else {
           this.setState({activeHostFCourses:[...this.state.activeHostFCourses,course]});
-          this.showMsg("přidán kurz","setup");
+          this.showMsg("přidán kurz (hostování)",course.code,"setup");
           reportSetupCmd(cmd.id,course);
         }
       break;
       default:
-        this.showMsg("neznámá ovládací karta","error"); 
+        this.showMsg("neznámá ovládací karta","","error"); 
         reportInfoLog("error","unexpected cmd card");
     }
   }
   onScanError(msg,raw_data) {
     console.log("onScanError",msg);
-    this.showMsg(msg,"error");
+    this.showMsg(msg,"","error");
   }
 
 
   render() {
     const classes = this.props.classes;
     const gridContainerClass = this.cfg.debug ? classes.gridContainerD: classes.gridContainer;
+    const gridItemClass = this.cfg.debug ? classes.gridItemD: classes.gridItem;
     return (
       <MuiThemeProvider theme={muitheme}>
         <Grid container className={gridContainerClass}>
@@ -416,12 +430,8 @@ class App extends React.Component {
               <CoursesChips courses={this.state.activeHostFCourses} />
             </div>
           </Grid>
-          <Grid item xs={8} >
-            <Grid container align={'center'} justify={'center'} style={{height: this.state.winHeight-heightSub}}>
-               <Grid item>
-                  <Display flash={this.state.message_flash} message={this.state.message} message_type={this.state.message_type}/>
-               </Grid >
-            </Grid>
+          <Grid item className={gridItemClass} xs={8} style={{height: this.state.winHeight-heightSub, paddingRight: "20px"}}>
+              <Display flash={this.state.message_flash} message={this.state.message} message_desc={this.state.message_desc} message_type={this.state.message_type}/>
           </Grid>
           <Grid item xs={12}>
             <div className={classes.gridPaper}>

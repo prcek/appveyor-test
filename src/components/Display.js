@@ -13,42 +13,48 @@ class Display extends Component {
 
     renderFlash() {
         return (
-            <div>
-                <Typography type="display4" align="center"> 
-                    <FontAwesome name="bullseye" style={{color:"white"}}/>
-                </Typography>
-            </div>
+            <Grid container align={'center'} justify={'center'} style={{height: "100%"}}>
+                <Grid item style={{height:"100%", width: "100%", backgroundColor:"white" }}>
+                    <div style={{ height:"100%", backgroundColor:"black"}}></div>
+                </Grid >
+            </Grid>
         )
     }
  
     renderMsg() {
         var icon_name = "bug";
         var icon_color = "gray";
+        var bcolor = "black";
         switch(this.props.message_type) {
-            case "error": icon_name = "warning"; icon_color="red"; break;
-            case "setup": icon_name = "wrench"; icon_color="white"; break;
-            case "init":  icon_name = "thumbs-o-up"; icon_color="white"; break;
-            case "idle":  icon_name = "search"; icon_color="gray"; break;
+            case "error": icon_name = "warning"; icon_color="white"; bcolor="red"; break;
+            case "setup": icon_name = "wrench"; icon_color="white"; bcolor="black"; break;
+            case "init":  icon_name = "thumbs-o-up"; icon_color="white"; bcolor="black"; break;
+            case "ok":  icon_name = "thumbs-o-up"; icon_color="white"; bcolor="green"; break;
+            case "ok-male":  icon_name = "male"; icon_color="white"; bcolor="green"; break;
+            case "ok-female":  icon_name = "female"; icon_color="white"; bcolor="green"; break;
+            case "idle":  icon_name = "search"; icon_color="gray"; bcolor="#151515"; break;
             case "manual": icon_name = "search"; icon_color="blue"; break;
         }
         return (
-            <div>
-                <Typography type="display4" align="center"> 
-                    <FontAwesome name={icon_name} style={{color:icon_color}}/>
-                </Typography>
-                <Typography type="display2" align="center"> 
-                    {this.props.message}
-                </Typography>
-            </div>
+            <Grid container align={'center'} justify={'center'} style={{height: "100%", backgroundColor: bcolor}}>
+                <Grid item>
+                    <Typography type="display4" align="center"> 
+                        <FontAwesome name={icon_name} style={{color:icon_color}}/>
+                    </Typography>
+                    <Typography type="display2" align="center" style={{color:icon_color}}> 
+                        {this.props.message}
+                    </Typography>
+                    <Typography type="display1" align="center" style={{color:icon_color}}> 
+                        {this.props.message_desc}
+                    </Typography>
+                </Grid >
+            </Grid>
+
         )
     };
 
     render() {
-        if (this.props.flash) {
-            return this.renderFlash();
-        } else {
-            return this.renderMsg();
-        }
+        return this.props.flash ? this.renderFlash(): this.renderMsg();
     }
         
 }

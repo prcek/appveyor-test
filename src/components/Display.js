@@ -32,6 +32,8 @@ class Display extends Component {
             case "ok":  icon_name = "thumbs-o-up"; icon_color="white"; bcolor="green"; break;
             case "ok-male":  icon_name = "male"; icon_color="white"; bcolor="green"; break;
             case "ok-female":  icon_name = "female"; icon_color="white"; bcolor="green"; break;
+            case "in":  icon_name = "thumbs-o-up"; icon_color="white"; bcolor="blue"; break;
+            case "out":  icon_name = "thumbs-o-up"; icon_color="white"; bcolor="blue"; break;
             case "idle":  icon_name = "search"; icon_color="gray"; bcolor="#151515"; break;
             case "manual": icon_name = "search"; icon_color="blue"; break;
         }

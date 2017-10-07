@@ -6,7 +6,7 @@ import Typography from 'material-ui/Typography';
 import FontAwesome from 'react-fontawesome';
 import { LinearProgress } from 'material-ui/Progress';
 import decode_card from '../utils/Decode';
-import {findRefGid,getCourse, reportRawScan} from '../utils/Db';
+import {findRefGid,findAssistant,getCourse, reportRawScan} from '../utils/Db';
 
 
 
@@ -19,7 +19,7 @@ const fakeCard6 = "TS_CMD*eJyrVipLLVKyUgoJNlTSUcpMATKd4x1dXOJ9gdzk/NKi4tR4sGhiek
 const fakeCard7 = "TS_CMD*eJyrVipLLVKyUgoJNlTSUcpMATKd4x1dXOLdgNzk/NKi4tR4sGhiekFVWl5QlU9EQUaye05Vcoavj2t6lEuScVhlslFoZLqns6NRQKpLZnq+L0Jrcn5KKlCzIUIkLzEXJFIVU2pgkGqYnZOYkgdmpigUlwAZhqaWqSn5IIaZYXZ+TnE2WNJSoSQxLxUkagBTrlQLAPrPPMM=*4290452104**";
 const fakeCard8 = "TS*71581*eJyrVipLLVKyUgoJNlTSUcpMUbIyNzS1MNRRKk5NLM7PA8oYGRia6xtaAGWT80uLilOBQiCleYm5IGZIfm5MqYFBqiGQNDQDSRSXFkHlnEqzyxJzUkBiqRVAfq5SLQCgwh9i*511121617*89993390**";
 const fakeCard9 = "TS*72210*eJyrVipLLVKyUgoJNlTSUcpMUbIyNzIyNNBRKk5NLM7PA8oYGRia6xtaAGWT80uLilOBQiCleYm5IKZXaU5mKpBbXFoEFQmLKTUwSE0pyc4vA7NAiotTK4AyaUq1ALKwH8w=*1471044403*2247658100**";
-
+const fakeCardA = "TS_A*eJyrVipLLVKyUgoJNlTSUcpMUbKyNDQyNtZRykvMTQWKJ+UnZWYDZYpLi6AiefllidlKtQDOrRD3*1451255502**";
 
 class ScanLine extends Component {
     constructor(props) {
@@ -113,6 +113,12 @@ class ScanLine extends Component {
                         this.props.onScanCmd(dc,c,data)
                     });
                 break;
+                case 'TS_A':
+                    console.log(dc);
+                    findAssistant(dc.id, (ass)=>{
+                        this.props.onScanAssistant(dc,ass,data);
+                    });
+                break;
                 default:
                 this.props.onScanError("neznámá karta",data)    
             }
@@ -128,6 +134,7 @@ class ScanLine extends Component {
                 </Typography>
                 <Button onClick={(e)=>this.onFakeCard(e,fakeCard8)}>TSCard_st</Button>
                 <Button onClick={(e)=>this.onFakeCard(e,fakeCard7)}>TSCard_cmd</Button>
+                <Button onClick={(e)=>this.onFakeCard(e,fakeCardA)}>TSCard_ass</Button>
             </div>
         )
     }
@@ -156,6 +163,7 @@ class ScanLine extends Component {
 ScanLine.propTypes = {
     active: PropTypes.bool.isRequired,
     onScanStudent: PropTypes.func.isRequired,
+    onScanAssistant: PropTypes.func.isRequired,
     onScanCmd: PropTypes.func.isRequired,
     onScanError: PropTypes.func.isRequired,
     onScanManual: PropTypes.func.isRequired

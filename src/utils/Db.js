@@ -25,6 +25,7 @@ var seasons_db = new Datastore({ filename: 'seasons.db', autoload: true });
 var folders_db = new Datastore({ filename: 'folders.db', autoload: true });
 var courses_db = new Datastore({ filename: 'courses.db', autoload: true });
 var students_db = new Datastore({ filename: 'students.db', autoload: true });
+var assistants_db = new Datastore({ filename: 'assistants.db', autoload: true });
 var activity_db = new Datastore({ filename: 'activity.db', autoload: true });
 
 var stateCallBack = null;
@@ -95,6 +96,16 @@ function updateFolders() {
     return new Promise(function(resolve,reject){
         remote_api.get("/folders").then(res=>{
             pMap(res.data.folders.map(fixId),(x)=>insertOrUpdate(folders_db,x),{concurency:1}).then(r=>{resolve("ok")}).catch(reject);
+        }).catch(reject)
+    });     
+}
+
+function updateAssistants() {
+    console.log("updateAssistants")
+    return new Promise(function(resolve,reject){
+        remote_api.get("/assistants").then(res=>{
+            //TODO clear assistants
+            pMap(res.data.assistants.map(fixId),(x)=>insertOrUpdate(assistants_db,x),{concurency:1}).then(r=>{resolve("ok")}).catch(reject);
         }).catch(reject)
     });     
 }
@@ -202,7 +213,7 @@ function updateCoursesAndDeleteOld() {
 
 function completeUpdate() {
     return new Promise(function(resolve,reject){
-        pSeries([updateSeasons,updateFolders,updateCoursesAndDeleteOld,updateAllStudentsAndDeleteOld,flushActivityLog]).then(r=>{
+        pSeries([updateSeasons,updateFolders,updateAssistants,updateCoursesAndDeleteOld,updateAllStudentsAndDeleteOld,flushActivityLog]).then(r=>{
             resolve(true);
         }).catch(reject);
     }); 
@@ -251,6 +262,20 @@ function findRefGid(ref_gid,callback) {
         }
     });
 }
+
+function findAssistant(ref_gid,callback) {
+    console.log("db looking for assistant ref_gid",ref_gid);
+    assistants_db.findOne({ ref_gid: ref_gid },function (err, doc) {
+        if (err) {
+            console.log("find err",err);
+            callback(null);
+        } else {
+            console.log("find res", doc !== null);
+            callback(doc);    
+        }
+    });
+}
+
 
 function getCoursesTree(callback) {
     var tree = [];
@@ -383,6 +408,20 @@ function reportEnter(status,student,course,mode) {
     logActivity(rep);
 }
 
+function reportAssistant(status,assistant,mode) {
+    const rep = {
+        _id: newID(),
+        date: new Date(),
+        station: cfg.station_name,
+        type: "assistant",
+        status: status,
+        assistant_id: assistant._id,
+        mode: mode,
+    };
+    logActivity(rep);
+}
+
+
 function reportRawScan(status,data) {
     const rep = {
         _id: newID(),
@@ -426,10 +465,12 @@ module.exports = {
     registerDBCallback: registerDBCallback,
     getSyncState: getSyncState,
     findRefGid: findRefGid,
+    findAssistant: findAssistant,
     getCoursesTree: getCoursesTree,
     getCourse: getCourse,
     getCourses: getCourses,
     reportEnter: reportEnter,
+    reportAssistant: reportAssistant,
     reportRawScan: reportRawScan,
     reportSetupCmd: reportSetupCmd,
     reportInfoLog: reportInfoLog

@@ -32,7 +32,7 @@ import ScanLine from './ScanLine';
 
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 
-import {startSync,stopSync,findRefGid,getCoursesTree,registerDBCallback,getSyncState,getCourse, getCourses, reportEnter, reportRawScan, reportSetupCmd, reportInfoLog} from '../utils/Db';
+import {startSync,stopSync,findRefGid,getCoursesTree,registerDBCallback,getSyncState,getCourse, getCourses, reportEnter, reportAssistant, reportRawScan, reportSetupCmd, reportInfoLog} from '../utils/Db';
 import ECom from '../utils/ECom';
 
 import Cfg from '../utils/Cfg';
@@ -98,6 +98,7 @@ class App extends React.Component {
       activeHostMCourses:[], 
       activeHostFCourses:[], 
       activeStudents:[],
+      activeAssistants:[],
       coursesList:[],
       winHeight: 500,
       winWidth: 500,
@@ -234,6 +235,25 @@ class App extends React.Component {
     this.restartHideTimeout();
   }
 
+  onScanAssistant(card,assistant,raw_data) {
+    console.log("onScanAssistant",card,assistant);
+    if (assistant === null) {
+      this.showMsg("","neznámý assisten","error");
+      reportInfoLog("error","missing assistant");
+      return;
+    } 
+    if (this.isInActiveList(this.state.activeAssistants,assistant)) {
+      const newAl = this.removeFromActiveList(this.state.activeAssistants,assistant);
+      this.setState({activeAssistants:newAl});
+      this.showMsg(assistant.name,"odchod","out");
+      reportAssistant("ok",assistant,"out");
+    } else {
+      this.setState({activeAssistants:[...this.state.activeAssistants,assistant]});
+      this.showMsg(assistant.name,"příchod","in");
+      reportAssistant("ok",assistant,"in");
+    }
+  }
+
   onScanStudent(card,student,course,raw_data) {
     console.log("onScanStudent",card,student,course);
     if (student === null) {
@@ -292,6 +312,10 @@ class App extends React.Component {
       return (c._id === course._id);
     })
     return fc !== undefined;
+  }
+
+  removeFromActiveList(list,item) {
+    return list.filter(i=>i._id != item._id);
   }
 
   onScanCmd(cmd,course,raw_data) {
@@ -439,6 +463,7 @@ class App extends React.Component {
                 debug={this.cfg.debug}
                 active={!(this.state.cfgOpen || this.state.coursesOpen)}
                 onScanStudent = {(card,st,cs,rd)=>this.onScanStudent(card,st,cs,rd)}
+                onScanAssistant = {(card,ass,rd)=>this.onScanAssistant(card,ass,rd)}
                 onScanCmd = {(cmd,c,rd)=>this.onScanCmd(cmd,c,rd)}
                 onScanError = {(msg,rd)=>this.onScanError(msg,rd)}
                 onScanManual = {(val)=>this.onScanManual(val)}

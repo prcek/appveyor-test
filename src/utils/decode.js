@@ -49,7 +49,23 @@ function decode_card(s) {
         var rs = bin2json(data);     
         rs['action'] = els[0];
         return rs;
-    } 
+    } else if (s.match(/^TS_A\*/)) {
+        console.log("assistent card");
+        const els = s.split("\*");
+        if (els.length != 5) {
+            console.log("wrong format")
+            return null;
+        }
+        const data = els[1];
+        const crc = els[2];
+        const c = CRC.crc32(data+"*"+els[0]);
+        if (crc != c) {
+            return null;
+        }
+        var rs = bin2json(data);     
+        rs['action'] = els[0];
+        return rs;
+    }
     return null;
 }
 

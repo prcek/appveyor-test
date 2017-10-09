@@ -108,6 +108,7 @@ class App extends React.Component {
     this.updateDimensions = this.updateDimensions.bind(this);
     this.hideTimeout = null;
     this.flashTimeout = null;
+    this.entryLog = [];
   }
   onSyncButton(e) {
     console.log("sync button!");
@@ -218,6 +219,18 @@ class App extends React.Component {
     },200)
   }
 
+  logEntryTime(id) {
+    this.entryLog[id]= new Date();
+  }
+  getEntryTimeDelay(id) {
+    var time = (new Date()) - this.entryLog[id];
+    time = time /(1000);
+    if (time < 120) {
+      return Math.round(time) + " sec";
+    }
+    time = time /60;
+    return Math.round(time)+" min";
+  }
 
   showMsg(msg,desc,type) {
     if ((msg == null) || (msg == undefined)) {
@@ -273,7 +286,8 @@ class App extends React.Component {
     }    
 
     if (this.isInActiveList(this.state.activeStudents,student)) {
-      this.showMsg(student.name,"opakovaný vstup","error");
+      const d = this.getEntryTimeDelay(student._id);
+      this.showMsg(student.name,"opakovaný vstup ("+d+")","error");
       reportEnter("duplicate",student,course,"");
       return;
     }
@@ -281,6 +295,7 @@ class App extends React.Component {
 
     if (this.isInActiveList(this.state.activeCourses,course)) {
       this.setState({activeStudents:[...this.state.activeStudents,student]});
+      this.logEntryTime(student._id);
       if (student.sex === "m") {
         this.showMsg(student.name,"vstup povolen","ok-male");
       } else if (student.sex === "f") {
@@ -294,6 +309,7 @@ class App extends React.Component {
 
     if ((student.sex === "m") && (this.isInActiveList(this.state.activeHostMCourses,course))) {
       this.setState({activeStudents:[...this.state.activeStudents,student]});
+      this.logEntryTime(student._id);      
       this.showMsg(student.name,"hostování povoleno","ok-male");
       reportEnter("ok",student,course,"guest");
       return;
@@ -301,6 +317,7 @@ class App extends React.Component {
 
     if ((student.sex === "f") && (this.isInActiveList(this.state.activeHostFCourses,course))) {
       this.setState({activeStudents:[...this.state.activeStudents,student]});
+      this.logEntryTime(student._id);      
       this.showMsg(student.name,"hostování povoleno","ok-female");
       reportEnter("ok",student,course,"guest");
       return;

@@ -91,6 +91,7 @@ class App extends React.Component {
       message_desc: "verze 1.1", 
       message_type: "init",
       activeSync: false, 
+      scanReady: false,
       syncOk:null, 
       cfgOpen: false, 
       coursesOpen: false, 
@@ -228,6 +229,10 @@ class App extends React.Component {
     this.setState({message: msg, message_desc: desc, message_type:type,message_flash:true})
     this.restartFlashTimeout();
     this.restartHideTimeout();
+  }
+
+  onScanReady(ready) {
+    this.setState({scanReady:ready});
   }
 
   onScanManual(val) {
@@ -455,7 +460,7 @@ class App extends React.Component {
             </div>
           </Grid>
           <Grid item className={gridItemClass} xs={8} style={{height: this.state.winHeight-heightSub, paddingRight: "20px"}}>
-              <Display flash={this.state.message_flash} message={this.state.message} message_desc={this.state.message_desc} message_type={this.state.message_type}/>
+              <Display  scan_active={this.state.scanReady} flash={this.state.message_flash} message={this.state.message} message_desc={this.state.message_desc} message_type={this.state.message_type}/>
           </Grid>
           <Grid item xs={12}>
             <div className={classes.gridPaper}>
@@ -467,6 +472,7 @@ class App extends React.Component {
                 onScanCmd = {(cmd,c,rd)=>this.onScanCmd(cmd,c,rd)}
                 onScanError = {(msg,rd)=>this.onScanError(msg,rd)}
                 onScanManual = {(val)=>this.onScanManual(val)}
+                onScanReady = {(val)=>this.onScanReady(val)}
               />
             </div>
           </Grid>

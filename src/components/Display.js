@@ -34,7 +34,16 @@ class Display extends Component {
             case "ok-female":  icon_name = "female"; icon_color="white"; bcolor="green"; break;
             case "in":  icon_name = "thumbs-o-up"; icon_color="white"; bcolor="blue"; break;
             case "out":  icon_name = "thumbs-o-up"; icon_color="white"; bcolor="blue"; break;
-            case "idle":  icon_name = "search"; icon_color="gray"; bcolor="#151515"; break;
+            case "idle":  
+                if (this.props.scan_active) {
+                    icon_name = "search"; 
+                    icon_color="gray"; 
+                } else {
+                    icon_name = "times"; 
+                    icon_color="gray"; 
+                }
+                bcolor="#151515"; 
+                break;
             case "manual": icon_name = "search"; icon_color="blue"; break;
         }
         return (
@@ -79,6 +88,7 @@ Display.propTypes = {
     flash: PropTypes.bool,
     message: PropTypes.string,
     message_type: PropTypes.string,
+    scan_active: PropTypes.bool,
 };
 
 

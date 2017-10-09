@@ -69,9 +69,11 @@ class ScanLine extends Component {
     
     onBlur() {
         this.setState({ focused: false, focusLost: new Date() })
+        this.props.onScanReady(false);
     }
     onFocus() {
         this.setState({ focused: true })
+        this.props.onScanReady(true);
     }
     
     onFakeCard(e,data) {
@@ -166,7 +168,8 @@ ScanLine.propTypes = {
     onScanAssistant: PropTypes.func.isRequired,
     onScanCmd: PropTypes.func.isRequired,
     onScanError: PropTypes.func.isRequired,
-    onScanManual: PropTypes.func.isRequired
+    onScanManual: PropTypes.func.isRequired,
+    onScanReady: PropTypes.func.isRequired,
 };
 
 
